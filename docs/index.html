@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gündem Servisi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=Newsreader:ital,wght@0,400;0,500;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #16130f;
+    --paper: #f2ead9;
+    --paper-dim: #e7ddc7;
+    --ink: #211a12;
+    --amber: #ffb100;
+    --rule: #55493a;
+    --muted: #8c8071;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--paper);
+    font-family: 'Newsreader', serif;
+    padding: 0 0 6rem;
+  }
+  .masthead {
+    border-bottom: 3px solid var(--amber);
+    padding: 2.2rem 1.5rem 1.4rem;
+    max-width: 780px;
+    margin: 0 auto;
+  }
+  .ticker {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+  }
+  .masthead h1 {
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2.6rem, 7vw, 4.2rem);
+    letter-spacing: 0.01em;
+    margin: 0;
+    line-height: 0.92;
+    text-transform: uppercase;
+  }
+  .masthead .alt-baslik {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 0.7rem;
+  }
+  main {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+  .haber {
+    display: flex;
+    gap: 1.1rem;
+    padding: 1.7rem 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .rank {
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 800;
+    font-size: 2.3rem;
+    color: var(--amber);
+    line-height: 1;
+    min-width: 2.4ch;
+  }
+  .haber-govde { flex: 1; min-width: 0; }
+  .ust-satir {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  .etiket { color: var(--amber); }
+  .baslik {
+    font-family: 'Newsreader', serif;
+    font-weight: 500;
+    font-size: 1.35rem;
+    line-height: 1.28;
+    margin: 0 0 0.9rem;
+    color: var(--paper);
+  }
+  .sinyal-metre {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 0.9rem;
+  }
+  .centik {
+    height: 10px;
+    flex: 1;
+    background: var(--rule);
+    border-radius: 1px;
+  }
+  .centik.dolu { background: var(--amber); }
+  .kaynaklar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+  }
+  .kaynaklar-etiket {
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-right: 0.2rem;
+  }
+  .kaynak-pill {
+    color: var(--bg);
+    background: var(--paper-dim);
+    padding: 0.22rem 0.55rem;
+    border-radius: 3px;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .kaynak-pill:hover { background: var(--amber); }
+  .bos-durum {
+    padding: 3.5rem 0;
+    text-align: center;
+  }
+  .bos-baslik {
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 800;
+    font-size: 1.6rem;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.6rem;
+  }
+  .bos-aciklama {
+    color: var(--muted);
+    max-width: 46ch;
+    margin: 0 auto;
+    font-size: 0.95rem;
+  }
+  footer {
+    max-width: 780px;
+    margin: 2rem auto 0;
+    padding: 1.2rem 1.5rem 0;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+</style>
+</head>
+<body>
+  <div class="masthead">
+    <div class="ticker">SON GÜNCELLEME · 15.08.2026 — 18:09 · 23 KAYNAK TARANDI</div>
+    <h1>Gündem Servisi</h1>
+    <div class="alt-baslik">Şu anki eşiği geçen başlık yok.</div>
+  </div>
+  <main>
+    
+        <div class="bos-durum">
+          <p class="bos-baslik">Şu an eşiği geçen bir gündem yok.</p>
+          <p class="bos-aciklama">Son tarama 685 başlığı inceledi, ama hiçbiri
+          en az 15 farklı kaynakta aynı anda geçmedi. Bot 30 dakika sonra
+          tekrar tarayacak.</p>
+        </div>
+  </main>
+  <footer>
+    Bu sayfa 23 haber/spor kaynağının RSS akışı otomatik taranarak
+    her 30 dakikada bir yeniden üretilir. Sıralama, bir başlığın kaç farklı
+    kaynakta aynı anda geçtiğine göre yapılır.
+  </footer>
+</body>
+</html>
