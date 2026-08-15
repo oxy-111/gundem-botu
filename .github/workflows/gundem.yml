@@ -2,13 +2,11 @@ name: Gündem Botu
 
 on:
   schedule:
-    # Her 30 dakikada bir çalışır (UTC saatine göre). GitHub'ın yoğunluğuna
-    # göre birkaç dakika gecikme olabilir, bu normaldir.
     - cron: "*/30 * * * *"
-  workflow_dispatch: {}   # Bu sayede GitHub sayfasından "Run workflow" ile elle de tetikleyebilirsin
+  workflow_dispatch: {}
 
 permissions:
-  contents: write   # bot'un sayfayı repoya geri commit'leyebilmesi için gerekli
+  contents: write
 
 jobs:
   gundem-calistir:
@@ -27,7 +25,8 @@ jobs:
 
       - name: Botu çalıştır (docs/index.html üretir)
         run: python gundem_bot.py
-- name: Sayfayı repoya geri gönder
+
+      - name: Sayfayı repoya geri gönder
         run: |
           git config user.name "gundem-botu"
           git config user.email "gundem-botu@users.noreply.github.com"
@@ -35,8 +34,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "Değişiklik yok, commit atılmayacak."
           else
-            git commit -m "Gündem güncellendi $(date -u '+%Y-%m-%d %H:%M UTC')"
+            git commit -m "Gündem güncellendi"
             git pull --rebase origin main
             git push
           fi
-    
