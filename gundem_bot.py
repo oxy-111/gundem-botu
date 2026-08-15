@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import html
 import os
+import re
 import socket
 from datetime import datetime, timedelta, timezone
 from time import mktime
@@ -11,15 +12,23 @@ from rapidfuzz import fuzz
 
 from rss_kaynaklari import KAYNAKLAR
 
-# Bağlantı kilitlenmelerini önlemek için 10 sn zaman aşımı
+# Bağlantı kilitlenmelerini önlemek için zaman aşımı
 socket.setdefaulttimeout(10)
 
 # ------------------- AYARLAR -------------------
 MIN_KAYNAK_SAYISI = 3       # Gündem sayılması için min. kaynak sayısı
-SAAT_PENCERESI = 8          # İncelenecek son kaç saatin haberleri
+SAAT_PENCERESI = 8          # İncelenecek son saat penceresi
 BENZERLIK_ESIGI = 65        # Başlık benzerlik eşiği
-MAKS_HABER = 15             # Kategori başına yoğunluğa göre max haber
+MAKS_HABER = 15             # Kategori başına listelenecek maks. haber sayısı
 # -------------------------------------------------
+
+
+def html_temizle(metin):
+    """HTML etiketlerini ve fazla boşlukları temizler."""
+    if not metin:
+        return ""
+    temiz = re.sub(r"<[^>]+>", "", metin)
+    return " ".join(temiz.split()).strip()
 
 
 def rss_oku():
@@ -39,6 +48,10 @@ def rss_oku():
                 if not baslik:
                     continue
 
+                # Haber özetini (açıklamasını) çek ve temizle
+                ozet_ham = entry.get("summary") or entry.get("description") or ""
+                ozet = html_temizle(ozet_ham)
+
                 yayin_zamani = None
                 if entry.get("published_parsed"):
                     yayin_zamani = datetime.fromtimestamp(mktime(entry.published_parsed), tz=timezone.utc)
@@ -51,6 +64,7 @@ def rss_oku():
                 tum_haberler.append({
                     "baslik": baslik,
                     "link": link,
+                    "ozet": ozet,
                     "kaynak": isim,
                     "kategori": kategori,
                 })
@@ -70,12 +84,16 @@ def haberleri_grupla(haberler):
                 if benzerlik >= BENZERLIK_ESIGI:
                     grup["kaynaklar"].add(haber["kaynak"])
                     grup["link_dict"][haber["kaynak"]] = haber["link"]
+                    # En detaylı/uzun özeti grupta sakla
+                    if len(haber["ozet"]) > len(grup["ozet"]):
+                        grup["ozet"] = haber["ozet"]
                     eslesti = True
                     break
 
         if not eslesti:
             gruplar.append({
                 "baslik": haber["baslik"],
+                "ozet": haber["ozet"],
                 "kaynaklar": {haber["kaynak"]},
                 "link_dict": {haber["kaynak"]: haber["link"]},
                 "kategori": haber["kategori"],
@@ -93,6 +111,7 @@ def satir_render(grup, rank, maks_kaynak):
     kaynak_sayisi = len(grup["kaynaklar"])
     baslik = html.escape(grup["baslik"])
     kategori_etiket = grup["kategori"].upper()
+    ozet_metni = html.escape(grup["ozet"]) if grup["ozet"] else "Bu haber için detay metni bulunmuyor."
 
     TOPLAM_CENTIK = 15
     dolu = round((kaynak_sayisi / maks_kaynak) * TOPLAM_CENTIK) if maks_kaynak else 1
@@ -114,6 +133,14 @@ def satir_render(grup, rank, maks_kaynak):
         </div>
         <h2 class="baslik">{baslik}</h2>
         <div class="sinyal-metre">{centikler}</div>
+        
+        <details class="detay-alani">
+          <summary class="detay-buton">DETAY OKU</summary>
+          <div class="detay-icerik">
+            <p>{ozet_metni}</p>
+          </div>
+        </details>
+
         <div class="kaynaklar">
           <span class="kaynaklar-etiket">Kaynaklar:</span>
           {kaynak_pilleri}
@@ -153,35 +180,68 @@ def sayfa_olustur(genel_h, siyaset_h, futbol_h, toplam_kaynak):
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=Newsreader:ital,wght@0,400;0,500;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {{
-    --bg: #16130f;
-    --paper: #f2ead9;
-    --paper-dim: #e7ddc7;
+    --bg: #0a0a0a;
+    --card-bg: #121212;
+    --text-primary: #ededed;
+    --text-muted: #888888;
+    --border-color: #222222;
+    --pill-bg: #1e1e1e;
+    --pill-text: #cccccc;
     --amber: #ffb100;
-    --rule: #55493a;
-    --muted: #8c8071;
   }}
+
+  body.light-mode {{
+    --bg: #ffffff;
+    --card-bg: #f8f9fa;
+    --text-primary: #111111;
+    --text-muted: #666666;
+    --border-color: #e5e7eb;
+    --pill-bg: #f1f3f5;
+    --pill-text: #111111;
+    --amber: #d97706;
+  }}
+
   * {{ box-sizing: border-box; }}
   body {{
     margin: 0;
     background: var(--bg);
-    color: var(--paper);
+    color: var(--text-primary);
     font-family: 'Newsreader', serif;
     padding: 0 0 6rem;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }}
+
   .masthead {{
-    border-bottom: 3px solid var(--amber);
-    padding: 2.2rem 1.5rem 1.4rem;
+    border-bottom: 2px solid var(--amber);
+    padding: 2rem 1.5rem 1.4rem;
     max-width: 780px;
     margin: 0 auto;
+  }}
+  .masthead-top {{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.6rem;
   }}
   .ticker {{
     font-family: 'Space Mono', monospace;
     font-size: 0.72rem;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.12em;
     color: var(--amber);
     text-transform: uppercase;
-    margin-bottom: 0.6rem;
   }}
+  .theme-btn {{
+    background: var(--amber);
+    color: var(--bg);
+    border: none;
+    padding: 0.35rem 0.7rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 3px;
+  }}
+
   .masthead h1 {{
     font-family: 'Big Shoulders Display', sans-serif;
     font-weight: 800;
@@ -191,6 +251,7 @@ def sayfa_olustur(genel_h, siyaset_h, futbol_h, toplam_kaynak):
     line-height: 0.92;
     text-transform: uppercase;
   }}
+
   .tabs {{
     display: flex;
     gap: 0.5rem;
@@ -200,8 +261,8 @@ def sayfa_olustur(genel_h, siyaset_h, futbol_h, toplam_kaynak):
   }}
   .tab-btn {{
     background: transparent;
-    border: 1px solid var(--rule);
-    color: var(--muted);
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
     font-family: 'Space Mono', monospace;
     font-size: 0.85rem;
     font-weight: 700;
@@ -211,12 +272,13 @@ def sayfa_olustur(genel_h, siyaset_h, futbol_h, toplam_kaynak):
     transition: all 0.2s ease;
     border-radius: 2px;
   }}
-  .tab-btn:hover {{ border-color: var(--amber); color: var(--paper); }}
+  .tab-btn:hover {{ border-color: var(--amber); color: var(--text-primary); }}
   .tab-btn.active {{
     background: var(--amber);
     border-color: var(--amber);
     color: var(--bg);
   }}
+
   main {{
     max-width: 780px;
     margin: 0 auto;
@@ -224,11 +286,12 @@ def sayfa_olustur(genel_h, siyaset_h, futbol_h, toplam_kaynak):
   }}
   .tab-content {{ display: none; }}
   .tab-content.active {{ display: block; }}
+
   .haber {{
     display: flex;
     gap: 1.1rem;
     padding: 1.7rem 0;
-    border-bottom: 1px solid var(--rule);
+    border-bottom: 1px solid var(--border-color);
   }}
   .rank {{
     font-family: 'Big Shoulders Display', sans-serif;
@@ -246,7 +309,7 @@ def sayfa_olustur(genel_h, siyaset_h, futbol_h, toplam_kaynak):
     font-family: 'Space Mono', monospace;
     font-size: 0.68rem;
     letter-spacing: 0.08em;
-    color: var(--muted);
+    color: var(--text-muted);
     text-transform: uppercase;
     margin-bottom: 0.5rem;
   }}
@@ -255,22 +318,50 @@ def sayfa_olustur(genel_h, siyaset_h, futbol_h, toplam_kaynak):
     font-family: 'Newsreader', serif;
     font-weight: 500;
     font-size: 1.35rem;
-    line-height: 1.28;
-    margin: 0 0 0.9rem;
-    color: var(--paper);
+    line-height: 1.3;
+    margin: 0 0 0.8rem;
+    color: var(--text-primary);
   }}
+
   .sinyal-metre {{
     display: flex;
     gap: 3px;
     margin-bottom: 0.9rem;
   }}
   .centik {{
-    height: 8px;
+    height: 7px;
     flex: 1;
-    background: var(--rule);
+    background: var(--border-color);
     border-radius: 1px;
   }}
   .centik.dolu {{ background: var(--amber); }}
+
+  /* Detay Oku (Accordion) */
+  .detay-alani {{
+    margin: 0.8rem 0;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+  }}
+  .detay-buton {{
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--amber);
+    padding: 0.5rem 0.8rem;
+    cursor: pointer;
+    user-select: none;
+  }}
+  .detay-icerik {{
+    padding: 0 0.8rem 0.8rem;
+    font-family: 'Newsreader', serif;
+    font-size: 1.05rem;
+    line-height: 1.5;
+    color: var(--text-primary);
+  }}
+  .detay-icerik p {{ margin: 0; }}
+
   .kaynaklar {{
     display: flex;
     flex-wrap: wrap;
@@ -280,20 +371,26 @@ def sayfa_olustur(genel_h, siyaset_h, futbol_h, toplam_kaynak):
     font-size: 0.68rem;
   }}
   .kaynaklar-etiket {{
-    color: var(--muted);
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.08em;
     margin-right: 0.2rem;
   }}
   .kaynak-pill {{
-    color: var(--bg);
-    background: var(--paper-dim);
-    padding: 0.22rem 0.55rem;
+    color: var(--pill-text);
+    background: var(--pill-bg);
+    padding: 0.25rem 0.55rem;
+    border: 1px solid var(--border-color);
     border-radius: 3px;
     text-decoration: none;
     white-space: nowrap;
   }}
-  .kaynak-pill:hover {{ background: var(--amber); }}
+  .kaynak-pill:hover {{
+    background: var(--amber);
+    color: var(--bg);
+    border-color: var(--amber);
+  }}
+
   .bos-durum {{
     padding: 3.5rem 0;
     text-align: center;
@@ -307,32 +404,36 @@ def sayfa_olustur(genel_h, siyaset_h, futbol_h, toplam_kaynak):
     margin-bottom: 0.6rem;
   }}
   .bos-aciklama {{
-    color: var(--muted);
+    color: var(--text-muted);
     max-width: 46ch;
     margin: 0 auto;
     font-size: 0.95rem;
   }}
+
   footer {{
     max-width: 780px;
     margin: 2rem auto 0;
     padding: 1.2rem 1.5rem 0;
     font-family: 'Space Mono', monospace;
     font-size: 0.65rem;
-    color: var(--muted);
+    color: var(--text-muted);
     letter-spacing: 0.05em;
   }}
 </style>
 </head>
 <body>
   <div class="masthead">
-    <div class="ticker">SON GÜNCELLEME · {simdi} · {toplam_kaynak} KAYNAK TARANDI</div>
+    <div class="masthead-top">
+      <div class="ticker">SON GÜNCELLEME · {simdi} · {toplam_kaynak} KAYNAK TARANDI</div>
+      <button id="theme-btn" class="theme-btn" onclick="temaDegistir()">☀ AYDINLIK</button>
+    </div>
     <h1>Gündem Servisi</h1>
   </div>
 
   <div class="tabs">
-    <button class="tab-btn active" onclick="tabSec('genel')">Genel ({len(genel_h)})</button>
-    <button class="tab-btn" onclick="tabSec('siyaset')">Siyaset ({len(siyaset_h)})</button>
-    <button class="tab-btn" onclick="tabSec('futbol')">Futbol ({len(futbol_h)})</button>
+    <button class="tab-btn active" onclick="tabSec(event, 'genel')">Genel ({len(genel_h)})</button>
+    <button class="tab-btn" onclick="tabSec(event, 'siyaset')">Siyaset ({len(siyaset_h)})</button>
+    <button class="tab-btn" onclick="tabSec(event, 'futbol')">Futbol ({len(futbol_h)})</button>
   </div>
 
   <main>
@@ -346,13 +447,34 @@ def sayfa_olustur(genel_h, siyaset_h, futbol_h, toplam_kaynak):
   </footer>
 
   <script>
-    function tabSec(kategori) {{
+    function tabSec(e, kategori) {{
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       
-      event.target.classList.add('active');
+      e.currentTarget.classList.add('active');
       document.getElementById('tab-' + kategori).classList.add('active');
     }}
+
+    function temaDegistir() {{
+      const body = document.body;
+      const btn = document.getElementById('theme-btn');
+      body.classList.toggle('light-mode');
+      
+      if (body.classList.contains('light-mode')) {{
+        btn.innerText = '🌙 KARANLIK';
+        localStorage.setItem('tema', 'light');
+      }} else {{
+        btn.innerText = '☀ AYDINLIK';
+        localStorage.setItem('tema', 'dark');
+      }}
+    }}
+
+    (function() {{
+      if (localStorage.getItem('tema') === 'light') {{
+        document.body.classList.add('light-mode');
+        document.getElementById('theme-btn').innerText = '🌙 KARANLIK';
+      }}
+    }})();
   </script>
 </body>
 </html>"""
