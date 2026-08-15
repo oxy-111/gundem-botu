@@ -36,6 +36,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "Değişiklik yok, commit atılmayacak."
           else
-            git commit -m "Gündem güncellendi $(date -u '+%Y-%m-%d %H:%M UTC')"
+           git commit -m "Gündem güncellendi $(date -u '+%Y-%m-%d %H:%M UTC')"
+            git pull --rebase origin main
             git push
-          fi
