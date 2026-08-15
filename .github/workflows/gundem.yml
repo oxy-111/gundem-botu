@@ -27,8 +27,7 @@ jobs:
 
       - name: Botu çalıştır (docs/index.html üretir)
         run: python gundem_bot.py
-
-      - name: Sayfayı repoya geri gönder
+- name: Sayfayı repoya geri gönder
         run: |
           git config user.name "gundem-botu"
           git config user.email "gundem-botu@users.noreply.github.com"
@@ -36,6 +35,8 @@ jobs:
           if git diff --cached --quiet; then
             echo "Değişiklik yok, commit atılmayacak."
           else
-           git commit -m "Gündem güncellendi $(date -u '+%Y-%m-%d %H:%M UTC')"
+            git commit -m "Gündem güncellendi $(date -u '+%Y-%m-%d %H:%M UTC')"
             git pull --rebase origin main
             git push
+          fi
+    
