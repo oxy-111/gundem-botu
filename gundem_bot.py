@@ -28,7 +28,7 @@ from rapidfuzz import fuzz
 from rss_kaynaklari import KAYNAKLAR
 
 # ------------------- AYARLAR -------------------
-MIN_KAYNAK_SAYISI = 15       # Bir haberin "gündem" sayılması için gereken min. farklı kaynak sayısı
+MIN_KAYNAK_SAYISI = 3      # Bir haberin "gündem" sayılması için gereken min. farklı kaynak sayısı
 SAAT_PENCERESI = 6           # Kaç saat içindeki haberleri dikkate alalım (RSS'ler her 30 dk okunacağı için geniş tutuldu)
 BENZERLIK_ESIGI = 65         # 0-100 arası. Başlıklar bu oranın üstünde benzerse aynı haber sayılır
 MAKS_GUNDEM_HABER = 10       # Maile en fazla kaç haber koyulsun
