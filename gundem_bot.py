@@ -18,6 +18,7 @@ Bu script GitHub Actions tarafından her 30 dakikada bir otomatik çalıştırı
 
 import html
 import os
+import re
 from datetime import datetime, timedelta, timezone
 from time import mktime
 from zoneinfo import ZoneInfo
@@ -27,8 +28,23 @@ from rapidfuzz import fuzz
 
 from rss_kaynaklari import KAYNAKLAR
 
+_ETIKET_TEMIZLE = re.compile(r"<[^>]+>")
+_BOSLUK_TEMIZLE = re.compile(r"\s+")
+
+
+def ozet_temizle(ham_metin, maks_uzunluk=550):
+    """RSS özetindeki HTML etiketlerini temizler, 1-2 paragraflık kısa bir özet döndürür."""
+    if not ham_metin:
+        return ""
+    metin = _ETIKET_TEMIZLE.sub(" ", ham_metin)
+    metin = html.unescape(metin)
+    metin = _BOSLUK_TEMIZLE.sub(" ", metin).strip()
+    if len(metin) > maks_uzunluk:
+        metin = metin[:maks_uzunluk].rsplit(" ", 1)[0] + "…"
+    return metin
+
 # ------------------- AYARLAR -------------------
-MIN_KAYNAK_SAYISI = 3      # Bir haberin "gündem" sayılması için gereken min. farklı kaynak sayısı
+MIN_KAYNAK_SAYISI = 15       # Bir haberin "gündem" sayılması için gereken min. farklı kaynak sayısı
 SAAT_PENCERESI = 6           # Kaç saat içindeki haberleri dikkate alalım (RSS'ler her 30 dk okunacağı için geniş tutuldu)
 BENZERLIK_ESIGI = 65         # 0-100 arası. Başlıklar bu oranın üstünde benzerse aynı haber sayılır
 MAKS_GUNDEM_HABER = 10       # Maile en fazla kaç haber koyulsun
@@ -68,11 +84,13 @@ def rss_oku():
                 if yayin_zamani and yayin_zamani < sinir:
                     continue
 
+                ham_ozet = entry.get("summary", "") or entry.get("description", "")
                 tum_haberler.append({
                     "baslik": baslik,
                     "link": link,
                     "kaynak": isim,
                     "kategori": kategori,
+                    "ozet": ozet_temizle(ham_ozet),
                 })
         except Exception as e:
             print(f"[HATA] {isim} okunamadı: {e}")
@@ -93,6 +111,9 @@ def haberleri_grupla(haberler):
             if benzerlik >= BENZERLIK_ESIGI:
                 grup["kaynaklar"].add(haber["kaynak"])
                 grup["linkler"].append((haber["kaynak"], haber["link"]))
+                # En uzun/dolu özeti gruba sakla (bazı kaynaklarda özet boş olabilir)
+                if len(haber["ozet"]) > len(grup["ozet"]):
+                    grup["ozet"] = haber["ozet"]
                 eslesti = True
                 break
 
@@ -102,6 +123,7 @@ def haberleri_grupla(haberler):
                 "kaynaklar": {haber["kaynak"]},
                 "linkler": [(haber["kaynak"], haber["link"])],
                 "kategori": haber["kategori"],
+                "ozet": haber["ozet"],
             })
 
     return gruplar
@@ -139,22 +161,34 @@ def satir_render(grup, rank, maks_kaynak):
         for kaynak, link in sorted(grup["linkler"], key=lambda x: x[0])
     )
 
+    ozet = html.escape(grup.get("ozet") or "").strip()
+    if ozet:
+        ozet_html = f'<p class="ozet-metin">{ozet}</p>'
+    else:
+        ozet_html = '<p class="ozet-metin ozet-yok">Bu haber için kaynaklardan özet metni alınamadı.</p>'
+
     return f"""
-    <article class="haber">
-      <div class="rank">{rank:02d}</div>
-      <div class="haber-govde">
-        <div class="ust-satir">
-          <span class="etiket">{etiket}</span>
-          <span class="sinyal-sayi">{kaynak_sayisi} KAYNAK</span>
+    <details class="haber">
+      <summary class="haber-baslik-satiri">
+        <div class="rank">{rank:02d}</div>
+        <div class="haber-govde">
+          <div class="ust-satir">
+            <span class="etiket">{etiket}</span>
+            <span class="sinyal-sayi">{kaynak_sayisi} KAYNAK</span>
+          </div>
+          <h2 class="baslik">{baslik}</h2>
+          <div class="sinyal-metre">{centikler}</div>
         </div>
-        <h2 class="baslik">{baslik}</h2>
-        <div class="sinyal-metre">{centikler}</div>
+        <span class="ac-kapa-ikon" aria-hidden="true"></span>
+      </summary>
+      <div class="detay-panel">
+        {ozet_html}
         <div class="kaynaklar">
           <span class="kaynaklar-etiket">Kaynaklar:</span>
           {kaynak_pilleri}
         </div>
       </div>
-    </article>"""
+    </details>"""
 
 
 def sayfa_olustur(gundem_listesi, toplam_kaynak, taranan_baslik):
@@ -179,7 +213,7 @@ def sayfa_olustur(gundem_listesi, toplam_kaynak, taranan_baslik):
         durum_notu = "Şu anki eşiği geçen başlık yok."
 
     return f"""<!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" data-tema="koyu">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -197,20 +231,51 @@ def sayfa_olustur(gundem_listesi, toplam_kaynak, taranan_baslik):
     --rule: #55493a;
     --muted: #8c8071;
   }}
+  html[data-tema="acik"] {{
+    --bg: #f2ead9;
+    --paper: #211a12;
+    --paper-dim: #ffffff;
+    --ink: #211a12;
+    --amber: #a85e00;
+    --rule: #d8cdb2;
+    --muted: #6b5f4a;
+  }}
   * {{ box-sizing: border-box; }}
+  html {{ color-scheme: dark; }}
+  html[data-tema="acik"] {{ color-scheme: light; }}
   body {{
     margin: 0;
     background: var(--bg);
     color: var(--paper);
     font-family: 'Newsreader', serif;
     padding: 0 0 6rem;
+    transition: background 0.15s ease, color 0.15s ease;
   }}
   .masthead {{
     border-bottom: 3px solid var(--amber);
     padding: 2.2rem 1.5rem 1.4rem;
     max-width: 780px;
     margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
   }}
+  .masthead-metin {{ min-width: 0; }}
+  .tema-buton {{
+    flex-shrink: 0;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--bg);
+    background: var(--amber);
+    border: none;
+    border-radius: 3px;
+    padding: 0.55rem 0.85rem;
+    cursor: pointer;
+  }}
+  .tema-buton:hover {{ opacity: 0.85; }}
   .ticker {{
     font-family: 'Space Mono', monospace;
     font-size: 0.72rem;
@@ -240,11 +305,16 @@ def sayfa_olustur(gundem_listesi, toplam_kaynak, taranan_baslik):
     padding: 0 1.5rem;
   }}
   .haber {{
+    border-bottom: 1px solid var(--rule);
+  }}
+  .haber-baslik-satiri {{
     display: flex;
     gap: 1.1rem;
     padding: 1.7rem 0;
-    border-bottom: 1px solid var(--rule);
+    cursor: pointer;
+    list-style: none;
   }}
+  .haber-baslik-satiri::-webkit-details-marker {{ display: none; }}
   .rank {{
     font-family: 'Big Shoulders Display', sans-serif;
     font-weight: 800;
@@ -277,7 +347,6 @@ def sayfa_olustur(gundem_listesi, toplam_kaynak, taranan_baslik):
   .sinyal-metre {{
     display: flex;
     gap: 2px;
-    margin-bottom: 0.9rem;
   }}
   .centik {{
     height: 10px;
@@ -286,6 +355,31 @@ def sayfa_olustur(gundem_listesi, toplam_kaynak, taranan_baslik):
     border-radius: 1px;
   }}
   .centik.dolu {{ background: var(--amber); }}
+  .ac-kapa-ikon {{
+    flex-shrink: 0;
+    align-self: center;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-right: 2px solid var(--muted);
+    border-bottom: 2px solid var(--muted);
+    transform: rotate(45deg);
+    transition: transform 0.2s ease;
+  }}
+  details[open] .ac-kapa-ikon {{ transform: rotate(-135deg); }}
+  .detay-panel {{
+    padding: 0 0 1.9rem 3.5ch;
+  }}
+  .ozet-metin {{
+    font-family: 'Newsreader', serif;
+    font-size: 1.02rem;
+    line-height: 1.6;
+    color: var(--paper);
+    margin: 0 0 1rem;
+  }}
+  .ozet-metin.ozet-yok {{
+    color: var(--muted);
+    font-style: italic;
+  }}
   .kaynaklar {{
     display: flex;
     flex-wrap: wrap;
@@ -340,9 +434,12 @@ def sayfa_olustur(gundem_listesi, toplam_kaynak, taranan_baslik):
 </head>
 <body>
   <div class="masthead">
-    <div class="ticker">SON GÜNCELLEME · {simdi} · {toplam_kaynak} KAYNAK TARANDI</div>
-    <h1>Gündem Servisi</h1>
-    <div class="alt-baslik">{durum_notu}</div>
+    <div class="masthead-metin">
+      <div class="ticker">SON GÜNCELLEME · {simdi} · {toplam_kaynak} KAYNAK TARANDI</div>
+      <h1>Gündem Servisi</h1>
+      <div class="alt-baslik">{durum_notu}</div>
+    </div>
+    <button class="tema-buton" id="tema-buton" onclick="temaDegistir()">☀ Aydınlık</button>
   </div>
   <main>
     {icerik_html}
@@ -350,8 +447,33 @@ def sayfa_olustur(gundem_listesi, toplam_kaynak, taranan_baslik):
   <footer>
     Bu sayfa {toplam_kaynak} haber/spor kaynağının RSS akışı otomatik taranarak
     her 30 dakikada bir yeniden üretilir. Sıralama, bir başlığın kaç farklı
-    kaynakta aynı anda geçtiğine göre yapılır.
+    kaynakta aynı anda geçtiğine göre yapılır. Bir haberin üstüne tıklayarak
+    özetini açıp kapatabilirsin.
   </footer>
+  <script>
+    (function() {{
+      var kayitliTema = localStorage.getItem('gundem-tema');
+      if (kayitliTema) {{
+        document.documentElement.setAttribute('data-tema', kayitliTema);
+      }}
+      guncelleButonMetni();
+    }})();
+
+    function temaDegistir() {{
+      var mevcut = document.documentElement.getAttribute('data-tema');
+      var yeni = mevcut === 'acik' ? 'koyu' : 'acik';
+      document.documentElement.setAttribute('data-tema', yeni);
+      localStorage.setItem('gundem-tema', yeni);
+      guncelleButonMetni();
+    }}
+
+    function guncelleButonMetni() {{
+      var mevcut = document.documentElement.getAttribute('data-tema');
+      var buton = document.getElementById('tema-buton');
+      if (!buton) return;
+      buton.textContent = mevcut === 'acik' ? '● Karanlık' : '☀ Aydınlık';
+    }}
+  </script>
 </body>
 </html>"""
 
