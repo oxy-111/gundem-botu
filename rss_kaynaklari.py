@@ -1,16 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Takip edilecek RSS kaynakları.
-Format: ("Kaynak Adı", "RSS URL", "kategori")  kategori: "genel" | "spor"
-
-NOT: Bazı siteler zaman zaman RSS adreslerini değiştirebilir ya da geçici
-olarak erişilemez olabilir. Script, çalışmayan bir kaynağı otomatik olarak
-atlayıp diğerlerine devam edecek şekilde yazıldı (bkz. gundem_bot.py).
-Zamanla listeye yeni kaynaklar ekleyebilir, bozulanları çıkarabilirsin.
+Takip edilecek 50 RSS kaynağı (Genel haberler ve Spor).
 """
 
 KAYNAKLAR = [
-    # ---- Genel haber / siyaset ----
+    # ---- Genel Haber / Siyaset / Gündem (34 Kaynak) ----
     ("Hürriyet", "https://www.hurriyet.com.tr/rss/anasayfa", "genel"),
     ("Milliyet - Gündem", "https://www.milliyet.com.tr/rss/rssNew/gundemRss.xml", "genel"),
     ("Milliyet - Siyaset", "https://www.milliyet.com.tr/rss/rssNew/siyasetRss.xml", "genel"),
@@ -21,24 +15,46 @@ KAYNAKLAR = [
     ("Star Gazete", "https://www.stargazete.com/rss/rss.asp", "genel"),
     ("Takvim", "https://www.takvim.com.tr/rss/anasayfa.xml", "genel"),
     ("Yeni Şafak", "https://www.yenisafak.com/rss?xml=tumhaberler", "genel"),
-    ("Yeni Çağ", "https://www.yenicaggazetesi.com.tr/rss", "genel"),
+    ("Yeniçağ", "https://www.yenicaggazetesi.com.tr/rss", "genel"),
     ("Türkiye Gazetesi", "https://www.turkiyegazetesi.com.tr/rss/rss.xml", "genel"),
     ("Habertürk", "https://www.haberturk.com/rss", "genel"),
     ("NTV", "https://www.ntv.com.tr/gundem.rss", "genel"),
     ("10Haber", "https://10haber.net/feed/", "genel"),
+    ("T24", "https://t24.com.tr/rss", "genel"),
+    ("Diken", "https://www.diken.com.tr/feed/", "genel"),
+    ("BirGün", "https://www.birgun.net/xml/rss.xml", "genel"),
+    ("Evrensel", "https://www.evrensel.net/rss/haber.xml", "genel"),
+    ("Ensonhaber", "https://icdn.ensonhaber.com/rss/ensonhaber.xml", "genel"),
+    ("CNN Türk", "https://www.cnnturk.com/feed/rss/all/news", "genel"),
+    ("TRT Haber", "https://www.trthaber.com/xml_mobile.php?tur=xml_genel&kategori=manset", "genel"),
+    ("Anadolu Ajansı", "https://www.aa.com.tr/tr/rss/default?cat=guncel", "genel"),
+    ("Dünya Gazetesi", "https://www.dunya.com/rss", "genel"),
+    ("Gazete Duvar", "https://www.gazeteduvar.com.tr/rss", "genel"),
+    ("Karar", "https://www.karar.com/rss", "genel"),
+    ("Independent Türkçe", "https://www.indyturk.com/rss.xml", "genel"),
+    ("OdaTV", "https://www.odatv.com/rss.xml", "genel"),
+    ("BBC Türkçe", "https://feeds.bbci.co.uk/turkce/rss.xml", "genel"),
+    ("DW Türkçe", "https://rss.dw.com/rdf/rss-tur-all", "genel"),
+    ("Euronews Türkçe", "https://tr.euronews.com/rss?level=theme&name=news", "genel"),
+    ("Medyascope", "https://medyascope.tv/feed/", "genel"),
+    ("Webtekno", "https://www.webtekno.com/rss.xml", "genel"),
+    ("DonanımHaber", "https://www.donanimhaber.com/rss/tum/", "genel"),
 
-    # ---- Spor / futbol ----
+    # ---- Spor / Futbol (16 Kaynak) ----
     ("Sabah Spor", "https://www.sabah.com.tr/rss/spor.xml", "spor"),
-    ("Sözcü Futbol", "https://www.sozcu.com.tr/feeds-rss-category-futbol", "spor"),
     ("Sözcü Spor", "https://www.sozcu.com.tr/feeds-rss-category-spor", "spor"),
-    ("Sözcü Dünyadan Futbol", "https://www.sozcu.com.tr/feeds-rss-category-dunyadan-spor", "spor"),
+    ("Sözcü Futbol", "https://www.sozcu.com.tr/feeds-rss-category-futbol", "spor"),
+    ("Sözcü Dünyadan Spor", "https://www.sozcu.com.tr/feeds-rss-category-dunyadan-spor", "spor"),
     ("NTV Spor", "https://www.ntvspor.net/rss", "spor"),
     ("Fotomaç", "https://www.fotomac.com.tr/rss/anasayfa.xml", "spor"),
     ("Fanatik", "https://www.fanatik.com.tr/rss/anasayfa", "spor"),
     ("Orta Çizgi", "https://ortacizgi.com/feed", "spor"),
+    ("TRT Spor", "https://www.trtspor.com.tr/rss/", "spor"),
+    ("A Spor", "https://www.aspor.com.tr/rss/anasayfa.xml", "spor"),
+    ("Sporx", "https://www.sporx.com/rss/", "spor"),
+    ("Ajansspor", "https://ajansspor.com/rss", "spor"),
+    ("Goal Türkiye", "https://www.goal.com/feeds/tr/news", "spor"),
+    ("BeIN Sports", "https://beinsports.com.tr/rss", "spor"),
+    ("Habertürk Spor", "https://www.haberturk.com/rss/kategori/spor.xml", "spor"),
+    ("Hürriyet Spor", "https://www.hurriyet.com.tr/rss/spor", "spor"),
 ]
-
-# Not: Buradaki liste ~23 kaynak ile başlıyor. "50 kaynak" hedefine ulaşmak
-# için README'deki adımı takip ederek listeye kolayca yeni RSS linkleri
-# ekleyebilirsin (her satır bir kaynak). Kaynak sayısı arttıkça eşik
-# değerini (MIN_KAYNAK_SAYISI) de mantıklı şekilde ayarlaman gerekir.
