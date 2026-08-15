@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr" data-tema="koyu">
+<html lang="tr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,56 +12,24 @@
     --bg: #16130f;
     --paper: #f2ead9;
     --paper-dim: #e7ddc7;
-    --ink: #211a12;
     --amber: #ffb100;
     --rule: #55493a;
     --muted: #8c8071;
   }
-  html[data-tema="acik"] {
-    --bg: #f2ead9;
-    --paper: #211a12;
-    --paper-dim: #ffffff;
-    --ink: #211a12;
-    --amber: #a85e00;
-    --rule: #d8cdb2;
-    --muted: #6b5f4a;
-  }
   * { box-sizing: border-box; }
-  html { color-scheme: dark; }
-  html[data-tema="acik"] { color-scheme: light; }
   body {
     margin: 0;
     background: var(--bg);
     color: var(--paper);
     font-family: 'Newsreader', serif;
     padding: 0 0 6rem;
-    transition: background 0.15s ease, color 0.15s ease;
   }
   .masthead {
     border-bottom: 3px solid var(--amber);
     padding: 2.2rem 1.5rem 1.4rem;
     max-width: 780px;
     margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 1rem;
   }
-  .masthead-metin { min-width: 0; }
-  .tema-buton {
-    flex-shrink: 0;
-    font-family: 'Space Mono', monospace;
-    font-size: 0.68rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--bg);
-    background: var(--amber);
-    border: none;
-    border-radius: 3px;
-    padding: 0.55rem 0.85rem;
-    cursor: pointer;
-  }
-  .tema-buton:hover { opacity: 0.85; }
   .ticker {
     font-family: 'Space Mono', monospace;
     font-size: 0.72rem;
@@ -79,28 +47,45 @@
     line-height: 0.92;
     text-transform: uppercase;
   }
-  .masthead .alt-baslik {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.8rem;
+  .tabs {
+    display: flex;
+    gap: 0.5rem;
+    max-width: 780px;
+    margin: 1.5rem auto 0;
+    padding: 0 1.5rem;
+  }
+  .tab-btn {
+    background: transparent;
+    border: 1px solid var(--rule);
     color: var(--muted);
-    margin-top: 0.7rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.6rem 1.2rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+    border-radius: 2px;
+  }
+  .tab-btn:hover { border-color: var(--amber); color: var(--paper); }
+  .tab-btn.active {
+    background: var(--amber);
+    border-color: var(--amber);
+    color: var(--bg);
   }
   main {
     max-width: 780px;
     margin: 0 auto;
     padding: 0 1.5rem;
   }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
   .haber {
-    border-bottom: 1px solid var(--rule);
-  }
-  .haber-baslik-satiri {
     display: flex;
     gap: 1.1rem;
     padding: 1.7rem 0;
-    cursor: pointer;
-    list-style: none;
+    border-bottom: 1px solid var(--rule);
   }
-  .haber-baslik-satiri::-webkit-details-marker { display: none; }
   .rank {
     font-family: 'Big Shoulders Display', sans-serif;
     font-weight: 800;
@@ -132,40 +117,16 @@
   }
   .sinyal-metre {
     display: flex;
-    gap: 2px;
+    gap: 3px;
+    margin-bottom: 0.9rem;
   }
   .centik {
-    height: 10px;
+    height: 8px;
     flex: 1;
     background: var(--rule);
     border-radius: 1px;
   }
   .centik.dolu { background: var(--amber); }
-  .ac-kapa-ikon {
-    flex-shrink: 0;
-    align-self: center;
-    width: 0.6rem;
-    height: 0.6rem;
-    border-right: 2px solid var(--muted);
-    border-bottom: 2px solid var(--muted);
-    transform: rotate(45deg);
-    transition: transform 0.2s ease;
-  }
-  details[open] .ac-kapa-ikon { transform: rotate(-135deg); }
-  .detay-panel {
-    padding: 0 0 1.9rem 3.5ch;
-  }
-  .ozet-metin {
-    font-family: 'Newsreader', serif;
-    font-size: 1.02rem;
-    line-height: 1.6;
-    color: var(--paper);
-    margin: 0 0 1rem;
-  }
-  .ozet-metin.ozet-yok {
-    color: var(--muted);
-    font-style: italic;
-  }
   .kaynaklar {
     display: flex;
     flex-wrap: wrap;
@@ -220,254 +181,438 @@
 </head>
 <body>
   <div class="masthead">
-    <div class="masthead-metin">
-      <div class="ticker">SON GÜNCELLEME · 15.08.2026 — 19:08 · 50 KAYNAK TARANDI</div>
-      <h1>Gündem Servisi</h1>
-      <div class="alt-baslik">10 başlık, en az 3 kaynakta birden geçtiği için listelendi.</div>
-    </div>
-    <button class="tema-buton" id="tema-buton" onclick="temaDegistir()">☀ Aydınlık</button>
+    <div class="ticker">SON GÜNCELLEME · 15.08.2026 — 19:17 · 50 KAYNAK TARANDI</div>
+    <h1>Gündem Servisi</h1>
   </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="tabSec('genel')">Genel (12)</button>
+    <button class="tab-btn" onclick="tabSec('siyaset')">Siyaset (9)</button>
+    <button class="tab-btn" onclick="tabSec('futbol')">Futbol (6)</button>
+  </div>
+
   <main>
-    
-    <details class="haber">
-      <summary class="haber-baslik-satiri">
-        <div class="rank">01</div>
-        <div class="haber-govde">
-          <div class="ust-satir">
-            <span class="etiket">GENEL / SİYASET</span>
-            <span class="sinyal-sayi">11 KAYNAK</span>
-          </div>
-          <h2 class="baslik">İçişleri duyurdu: Yeni nesil suç örgütüyle bağlantılı olarak aranan şüpheli Bakü&#x27;de yakalandı</h2>
-          <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span></div>
+    <div id="tab-genel" class="tab-content active">
+    <article class="haber">
+      <div class="rank">01</div>
+      <div class="haber-govde">
+        <div class="ust-satir">
+          <span class="etiket">GENEL</span>
+          <span class="sinyal-sayi">4 KAYNAK</span>
         </div>
-        <span class="ac-kapa-ikon" aria-hidden="true"></span>
-      </summary>
-      <div class="detay-panel">
-        <p class="ozet-metin">Hakkında yakalama kararı bulunan suç örgütü şüphelisi Ö.A.K. Azerbaycan&#x27;da yakalanarak Türkiye&#x27;ye getirildi. İçişleri Bakanlığının açıklamasına göre, Emniyet Genel Müdürlüğü KOM Başkanlığı ve Cumhuriyet başsavcılıklarının koordinesinde, İstanbul Emniyet Müdürlüğü Organize Suçlarla Mücadele Şube Müdürlüğü ve Azerbaycan Polisi işbirliğiyle ortak çalışma yürütüldü. Yürütülen çalışmalarda, iş yeri kurşunlama ve iş insanlarından tehditle para istemek suretiyle yağmaya teşebbüs etme olaylarına karışan, bu suçlardan halen cezaevinde tutuklu bulunan…</p>
+        <h2 class="baslik">Son dakika... İranlı pilotlar Katar tarafından esir alındı</h2>
+        <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span></div>
         <div class="kaynaklar">
           <span class="kaynaklar-etiket">Kaynaklar:</span>
-          <a class="kaynak-pill" href="https://www.aa.com.tr/tr/gundem/yeni-nesil-suc-orgutleriyle-irtibatli-supheli-azerbaycanda-yakalanarak-turkiyeye-getirildi/4028344" target="_blank" rel="noopener">Anadolu Ajansı</a><a class="kaynak-pill" href="https://www.dunya.com/gundem/yeni-nesil-suc-orgutleriyle-irtibatli-sahis-azerbaycanda-yakalandi-haberi-836346" target="_blank" rel="noopener">Dünya Gazetesi</a><a class="kaynak-pill" href="https://www.haberler.com/haberler/istanbul-ve-azerbaycan-polisinin-operasyonunda-20148275-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.hurriyet.com.tr/gundem/icisleri-duyurdu-yeni-nesil-suc-orgutuyle-baglantili-olarak-aranan-supheli-bakude-yakalandi-43274475" target="_blank" rel="noopener">Hürriyet</a><a class="kaynak-pill" href="https://www.milliyet.com.tr/gundem/son-dakika-icisleri-duyurdu-bakude-yakalandi-turkiyeye-getirildi-7642050" target="_blank" rel="noopener">Milliyet - Gündem</a><a class="kaynak-pill" href="https://www.milliyet.com.tr/gundem/son-dakika-icisleri-duyurdu-bakude-yakalandi-turkiyeye-getirildi-7642050" target="_blank" rel="noopener">Milliyet - Siyaset</a><a class="kaynak-pill" href="https://www.ntv.com.tr/turkiye/bakude-yakalanan-suc-orgutu-suphelisi-turkiyeye-getirildi-1737503" target="_blank" rel="noopener">NTV</a><a class="kaynak-pill" href="https://www.odatv.com/guncel/icisleri-duyurdu-firari-supheli-bakude-yakalandi-120158857" target="_blank" rel="noopener">OdaTV</a><a class="kaynak-pill" href="https://www.sabah.com.tr/gundem/2026/08/15/icisleri-bakanligi-duyurdu-aranan-firari-bakude-yakalandi" target="_blank" rel="noopener">Sabah</a><a class="kaynak-pill" href="https://www.star.com.tr/guncel/yeni-nesil-suc-orgutlerine-goz-actirilmiyor-icisleri-bakude-yakalanan-sahis-turkiyeye-getirildi-haber-2034122/" target="_blank" rel="noopener">Star Gazete</a><a class="kaynak-pill" href="https://www.takvim.com.tr/guncel/2026/08/15/yeni-nesil-suc-orgutu-baglantili-aranan-supheli-bakude-yakalandi" target="_blank" rel="noopener">Takvim</a>
+          <a class="kaynak-pill" href="https://www.aa.com.tr/tr/dunya/iran-savas-sirasinda-dusen-2-savas-ucagindaki-iranli-4-pilottan-3u-katar-tarafindan-esir-alindi/4028176" target="_blank" rel="noopener">Anadolu Ajansı</a><a class="kaynak-pill" href="https://www.dunya.com/dunya/savas-ucagi-dustu-iranli-pilotlar-esir-alindi-haberi-836333" target="_blank" rel="noopener">Dünya</a><a class="kaynak-pill" href="https://www.haberler.com/guncel/iran-genelkurmay-baskanligi-abd-israil-ile-savas-20147784-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.hurriyet.com.tr/dunya/son-dakika-iran-fransiz-diplomatlari-gozaltina-aldi-43274372" target="_blank" rel="noopener">Hürriyet</a>
         </div>
       </div>
-    </details>
-    <details class="haber">
-      <summary class="haber-baslik-satiri">
-        <div class="rank">02</div>
-        <div class="haber-govde">
-          <div class="ust-satir">
-            <span class="etiket">GENEL / SİYASET</span>
-            <span class="sinyal-sayi">10 KAYNAK</span>
-          </div>
-          <h2 class="baslik">Son dakika... İranlı pilotlar Katar tarafından esir alındı</h2>
-          <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik "></span><span class="centik "></span></div>
+    </article>
+    <article class="haber">
+      <div class="rank">02</div>
+      <div class="haber-govde">
+        <div class="ust-satir">
+          <span class="etiket">GENEL</span>
+          <span class="sinyal-sayi">4 KAYNAK</span>
         </div>
-        <span class="ac-kapa-ikon" aria-hidden="true"></span>
-      </summary>
-      <div class="detay-panel">
-        <p class="ozet-metin">İran ordusu, Mart ayında Doha’ya düzenlenen bombalama görevinden dönerken dört Su-24 pilotundan üçünün güvenli bir şekilde fırlatma koltuğuyla atladığını, beş ay sonra hala hayatta olduklarını ve Katar tarafından alıkonduklarını resmen açıkladı. Pilotlar Javad Salehi, Abdul Majid Dashtian ve Omran Behrushian bir ABD üssüne yapılan bombardımandan sonra İran’a dönüş yolunda uçaklarının hava savunma sistemleri tarafından düşürülmesinin […]</p>
+        <h2 class="baslik">Mardin&#x27;de ilçe başkanı, 20 kişilik grupla damadının evini bastığı iddiasıyla gözaltına alındı</h2>
+        <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span></div>
         <div class="kaynaklar">
           <span class="kaynaklar-etiket">Kaynaklar:</span>
-          <a class="kaynak-pill" href="https://10haber.net/dunya/iran-katar-uc-iranli-savas-pilotunu-esir-tutuyor-729050/" target="_blank" rel="noopener">10Haber</a><a class="kaynak-pill" href="https://www.aa.com.tr/tr/dunya/iran-savas-sirasinda-dusen-2-savas-ucagindaki-iranli-4-pilottan-3u-katar-tarafindan-esir-alindi/4028176" target="_blank" rel="noopener">Anadolu Ajansı</a><a class="kaynak-pill" href="https://www.dunya.com/dunya/iran-genelkurmay-baskanligi-acikladi-3-iranli-pilot-katar-tarafindan-esir-alindi-haberi-836343" target="_blank" rel="noopener">Dünya Gazetesi</a><a class="kaynak-pill" href="https://www.dunya.com/dunya/savas-ucagi-dustu-iranli-pilotlar-esir-alindi-haberi-836333" target="_blank" rel="noopener">Dünya Gazetesi</a><a class="kaynak-pill" href="https://www.dunya.com/ekonomi/sezonun-ilk-palamutlari-tezgahlardaki-yerini-aldi-haberi-836328" target="_blank" rel="noopener">Dünya Gazetesi</a><a class="kaynak-pill" href="https://www.evrensel.net/haber/5996458/iran-iki-savas-ucagindaki-uc-pilot-katar-tarafindan-esir-alindi?utm_source=rss_feed&amp;utm_medium=rss&amp;utm_campaign=rss_syndication" target="_blank" rel="noopener">Evrensel</a><a class="kaynak-pill" href="https://www.haberler.com/politika/iran-genelkurmay-baskanligi-iranli-3-pilot-katar-20148203-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.haberler.com/dunya/iran-abd-ve-israil-ile-savasta-dusen-ucaklarin-3-20148039-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.haberler.com/guncel/iran-abd-israil-ile-savas-sirasinda-dusen-2-savas-20147862-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.haberler.com/guncel/iran-duyurdu-3-pilot-katar-tarafindan-esir-alindi-20147819-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.haberler.com/guncel/iran-genelkurmay-baskanligi-abd-israil-ile-savas-20147784-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.hurriyet.com.tr/dunya/iranli-pilotlar-katar-tarafindan-esir-alindi-43274277" target="_blank" rel="noopener">Hürriyet</a><a class="kaynak-pill" href="https://www.hurriyet.com.tr/dunya/son-dakika-iran-fransiz-diplomatlari-gozaltina-aldi-43274372" target="_blank" rel="noopener">Hürriyet</a><a class="kaynak-pill" href="https://www.karar.com/dunya-haberleri/iran-duyurdu-3-pilot-katarda-esir-tutuluyor-2065863" target="_blank" rel="noopener">Karar</a><a class="kaynak-pill" href="https://www.odatv.com/dunya/katar-iranli-pilotlari-esir-aldi-120158838" target="_blank" rel="noopener">OdaTV</a><a class="kaynak-pill" href="https://www.sabah.com.tr/dunya/son-dakika-iran-genelkurmay-baskanligi-iranli-4-pilottan-3u-katar-tarafindan-esir-alindi-7642060" target="_blank" rel="noopener">Sabah</a><a class="kaynak-pill" href="https://www.sozcu.com.tr/iran-duyurdu-katar-3-pilotumuzu-esir-aldi-p349627" target="_blank" rel="noopener">Sözcü</a>
+          <a class="kaynak-pill" href="https://www.cnnturk.com/yerel-haberler/mardin/ilce-baskani-20-kisilik-grupla-damadinin-evini-bastigi-iddiasiyla-gozaltina-alindi-3454942" target="_blank" rel="noopener">CNN Türk</a><a class="kaynak-pill" href="https://www.haberler.com/guncel/ilce-baskani-20-kisilik-grupla-damadinin-evini-20148163-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.hurriyet.com.tr/gundem/mardinde-ilce-baskani-20-kisilik-grupla-damadinin-evini-bastigi-iddiasiyla-gozaltina-alindi-43274432" target="_blank" rel="noopener">Hürriyet</a><a class="kaynak-pill" href="https://www.sabah.com.tr/yasam/mardinde-20-kisilik-grupla-damadinin-evini-basti-ilce-baskani-gozaltina-alindi-7642143" target="_blank" rel="noopener">Sabah</a>
         </div>
       </div>
-    </details>
-    <details class="haber">
-      <summary class="haber-baslik-satiri">
-        <div class="rank">03</div>
-        <div class="haber-govde">
-          <div class="ust-satir">
-            <span class="etiket">GENEL / SİYASET</span>
-            <span class="sinyal-sayi">10 KAYNAK</span>
-          </div>
-          <h2 class="baslik">Süper Lig&amp;apos;de ilk hafta: Kasımpaşa-Trabzonspor maçının VAR hakemi belli oldu</h2>
-          <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik "></span><span class="centik "></span></div>
+    </article>
+    <article class="haber">
+      <div class="rank">03</div>
+      <div class="haber-govde">
+        <div class="ust-satir">
+          <span class="etiket">GENEL</span>
+          <span class="sinyal-sayi">4 KAYNAK</span>
         </div>
-        <span class="ac-kapa-ikon" aria-hidden="true"></span>
-      </summary>
-      <div class="detay-panel">
-        <p class="ozet-metin">Beşiktaş ve Trabzonspor&#x27;un Avrupa maçlarını yönetecek hakemler belli oldu 15.08.2026 Diken Beşiktaş ve Trabzonspor&#x27;un UEFA Avrupa Ligi play-off turundaki ilk maçlarını yönetecek hakemler belli oldu. The post Beşiktaş ve Trabzonspor&#x27;un Avrupa maçlarını yönetecek hakemler belli oldu appeared first on #site_linkat 15.08.2026 .</p>
+        <h2 class="baslik">İranlı 3 pilotu Katar esir aldı! 2 savaş uçağı düştü</h2>
+        <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span></div>
         <div class="kaynaklar">
           <span class="kaynaklar-etiket">Kaynaklar:</span>
-          <a class="kaynak-pill" href="https://www.aspor.com.tr/trabzonspor/2026/08/15/kasimpasa-trabzonspor-maci-canli-trendyol-super-lig" target="_blank" rel="noopener">A Spor</a><a class="kaynak-pill" href="https://www.aspor.com.tr/avrupa-ligi/2026/08/15/besiktas-ve-trabzonsporun-uefa-avrupa-liginde-maclarini-yonetecek-hakemler-belli-oldu" target="_blank" rel="noopener">A Spor</a><a class="kaynak-pill" href="https://www.aspor.com.tr/trabzonspor/2026/08/15/kasimpasa-trabzonspor-macinin-var-gorevlendirmeleri-aciklandi" target="_blank" rel="noopener">A Spor</a><a class="kaynak-pill" href="https://www.aa.com.tr/tr/spor/besiktas-ve-trabzonsporun-uefa-avrupa-liginde-maclarini-yonetecek-hakemler-belli-oldu/4028210" target="_blank" rel="noopener">Anadolu Ajansı</a><a class="kaynak-pill" href="https://www.diken.com.tr/besiktas-ve-trabzonsporun-avrupa-maclarini-yonetecek-hakemler-belli-oldu/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=besiktas-ve-trabzonsporun-avrupa-maclarini-yonetecek-hakemler-belli-oldu" target="_blank" rel="noopener">Diken</a><a class="kaynak-pill" href="https://www.haberler.com/spor/kasimpasa-trabzonspor-macinin-var-i-fedayi-san-20147368-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.hurriyet.com.tr/sporarena/trabzonspor-ferencvaros-macinin-hakemi-belli-oldu-43274330" target="_blank" rel="noopener">Hürriyet Spor</a><a class="kaynak-pill" href="https://www.karar.com/spor-haberleri/besiktas-ve-trabzonsporun-uefa-avrupa-liginde-maclarini-yonetecek-2065864" target="_blank" rel="noopener">Karar</a><a class="kaynak-pill" href="https://www.odatv.com/spor/genclerbirligi-fenerbahce-macina-iskoc-var-hakemi-120158834" target="_blank" rel="noopener">OdaTV</a><a class="kaynak-pill" href="https://www.sozcu.com.tr/avrupa-da-besiktas-ve-trabzonspor-maclarini-yonetecek-hakemler-belli-oldu-p349636" target="_blank" rel="noopener">Sözcü Futbol</a><a class="kaynak-pill" href="https://www.sozcu.com.tr/avrupa-da-besiktas-ve-trabzonspor-maclarini-yonetecek-hakemler-belli-oldu-p349636" target="_blank" rel="noopener">Sözcü Spor</a><a class="kaynak-pill" href="https://www.yenicaggazetesi.com/kasimpasa-trabzonspor-canli-anlatim-1062224h.htm" target="_blank" rel="noopener">Yeniçağ</a>
+          <a class="kaynak-pill" href="https://10haber.net/dunya/iran-katar-uc-iranli-savas-pilotunu-esir-tutuyor-729050/" target="_blank" rel="noopener">10Haber</a><a class="kaynak-pill" href="https://www.haberler.com/guncel/iran-duyurdu-3-pilot-katar-tarafindan-esir-alindi-20147819-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.sabah.com.tr/dunya/son-dakika-iran-genelkurmay-baskanligi-iranli-4-pilottan-3u-katar-tarafindan-esir-alindi-7642060" target="_blank" rel="noopener">Sabah</a><a class="kaynak-pill" href="https://www.sozcu.com.tr/iran-duyurdu-katar-3-pilotumuzu-esir-aldi-p349627" target="_blank" rel="noopener">Sözcü</a>
         </div>
       </div>
-    </details>
-    <details class="haber">
-      <summary class="haber-baslik-satiri">
-        <div class="rank">04</div>
-        <div class="haber-govde">
-          <div class="ust-satir">
-            <span class="etiket">GENEL / SİYASET</span>
-            <span class="sinyal-sayi">10 KAYNAK</span>
-          </div>
-          <h2 class="baslik">İstanbul&#x27;da yarın bu yollar trafiğe kapalı</h2>
-          <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik "></span><span class="centik "></span></div>
+    </article>
+    <article class="haber">
+      <div class="rank">04</div>
+      <div class="haber-govde">
+        <div class="ust-satir">
+          <span class="etiket">GENEL</span>
+          <span class="sinyal-sayi">4 KAYNAK</span>
         </div>
-        <span class="ac-kapa-ikon" aria-hidden="true"></span>
-      </summary>
-      <div class="detay-panel">
-        <p class="ozet-metin">İstanbul Büyükşehir Belediyesi Afet İşleri ve Risk Yönetimi Dairesi Başkanlığı AKOM ile İstanbul Valiliği’nin meteorolojik uyarıları doğrultusunda alınan karar kapsamında, rüzgarın kent genelinde saatte 40 ila 70 kilometre hıza ulaşmasının beklendiği belirtildi. Dal kırılması ve ağaç devrilmesi risklerine karşı vatandaşların güvenliğinin sağlanması amacıyla bazı yeşil alanlara geçici olarak ziyaretçi girişinin durdurulduğu açıklandı. Ziyarete kapatılan alanlar […]</p>
+        <h2 class="baslik">İstanbul&#x27;da yarın bu yollar trafiğe kapalı</h2>
+        <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span></div>
         <div class="kaynaklar">
           <span class="kaynaklar-etiket">Kaynaklar:</span>
-          <a class="kaynak-pill" href="https://10haber.net/gundem/kuvvetli-ruzgar-onlemi-istanbulda-koru-ve-kent-ormanlari-ziyarete-kapatildi-729030/" target="_blank" rel="noopener">10Haber</a><a class="kaynak-pill" href="https://www.aa.com.tr/tr/kultur/11-uluslararasi-istanbul-arapca-kitap-fuari-basladi-/4028244" target="_blank" rel="noopener">Anadolu Ajansı</a><a class="kaynak-pill" href="https://www.aa.com.tr/tr/gundem/istanbulda-yarin-bazi-yollar-trafige-kapatilacak-/4028195" target="_blank" rel="noopener">Anadolu Ajansı</a><a class="kaynak-pill" href="https://www.cnnturk.com/turkiye/istanbulda-yarin-bu-yollar-trafige-kapatilacak-alternatif-guzergahlar-belli-oldu-3454923" target="_blank" rel="noopener">CNN Türk</a><a class="kaynak-pill" href="https://www.diken.com.tr/istanbulda-yarin-bazi-yollar-trafige-kapatilacak-3/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=istanbulda-yarin-bazi-yollar-trafige-kapatilacak-3" target="_blank" rel="noopener">Diken</a><a class="kaynak-pill" href="https://www.dunya.com/gundem/istanbulda-yarin-bazi-yollar-trafige-kapatilacak-saatler-ve-alternatif-guzergahlar-belli-oldu-haberi-836335" target="_blank" rel="noopener">Dünya Gazetesi</a><a class="kaynak-pill" href="https://www.evrensel.net/haber/5996453/istanbulda-kuvvetli-ruzgar-onlemi-koru-ve-kent-ormanlari-ziyarete-kapatildi?utm_source=rss_feed&amp;utm_medium=rss&amp;utm_campaign=rss_syndication" target="_blank" rel="noopener">Evrensel</a><a class="kaynak-pill" href="https://www.haberturk.com/son-dakika-istanbul-da-yarin-bazi-yollar-trafige-kapatilacak-3905831" target="_blank" rel="noopener">Habertürk</a><a class="kaynak-pill" href="https://www.karar.com/sehir-haberleri/istanbulda-yarin-bazi-yollar-trafige-kapatilacak-11-2065855" target="_blank" rel="noopener">Karar</a><a class="kaynak-pill" href="https://www.ntv.com.tr/turkiye/hafta-sonu-plani-olanlar-dikkat-istanbulda-yarin-bu-yollar-kapali-1737493" target="_blank" rel="noopener">NTV</a><a class="kaynak-pill" href="https://www.odatv.com/guncel/istanbulda-firtina-uyarisi-120158848" target="_blank" rel="noopener">OdaTV</a>
+          <a class="kaynak-pill" href="https://www.aa.com.tr/tr/gundem/istanbulda-yarin-bazi-yollar-trafige-kapatilacak-/4028195" target="_blank" rel="noopener">Anadolu Ajansı</a><a class="kaynak-pill" href="https://www.cnnturk.com/turkiye/istanbulda-yarin-bu-yollar-trafige-kapatilacak-alternatif-guzergahlar-belli-oldu-3454923" target="_blank" rel="noopener">CNN Türk</a><a class="kaynak-pill" href="https://www.haberturk.com/son-dakika-istanbul-da-yarin-bazi-yollar-trafige-kapatilacak-3905831" target="_blank" rel="noopener">Habertürk</a><a class="kaynak-pill" href="https://www.ntv.com.tr/turkiye/hafta-sonu-plani-olanlar-dikkat-istanbulda-yarin-bu-yollar-kapali-1737493" target="_blank" rel="noopener">NTV</a>
         </div>
       </div>
-    </details>
-    <details class="haber">
-      <summary class="haber-baslik-satiri">
-        <div class="rank">05</div>
-        <div class="haber-govde">
-          <div class="ust-satir">
-            <span class="etiket">GENEL / SİYASET</span>
-            <span class="sinyal-sayi">9 KAYNAK</span>
-          </div>
-          <h2 class="baslik">Antalya ve Balıkesir&#x27;de orman yangını! Ekipler müdahale ediyor</h2>
-          <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span></div>
+    </article>
+    <article class="haber">
+      <div class="rank">05</div>
+      <div class="haber-govde">
+        <div class="ust-satir">
+          <span class="etiket">GENEL</span>
+          <span class="sinyal-sayi">3 KAYNAK</span>
         </div>
-        <span class="ac-kapa-ikon" aria-hidden="true"></span>
-      </summary>
-      <div class="detay-panel">
-        <p class="ozet-metin">Kemer ilçesi Ulupınar Mahallesi Çıralı mevkiinde saat 11.30 sıralarında orman yangını çıktı. İhbarla bölgeye ekipler sevk edildi. Yangına ilk etapta 4 helikopter, 2 uçak, 7 arazöz, 3 su ikmal aracı, 55 teknik personel ve yangın işçisiyle havadan ve karadan müdahaleye başlandı. Aynı bölgenin yakınlarında önceki gün akşam saatlerinde çıkan orman yangını yaklaşık 14 saat sonra […]</p>
+        <h2 class="baslik">İstanbul’da sahile İHA olduğu değerlendirilen cisim vurdu</h2>
+        <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span></div>
         <div class="kaynaklar">
           <span class="kaynaklar-etiket">Kaynaklar:</span>
-          <a class="kaynak-pill" href="https://10haber.net/gundem/antalyada-orman-yangini-ekipler-mudahale-ediyor-728974/" target="_blank" rel="noopener">10Haber</a><a class="kaynak-pill" href="https://www.diken.com.tr/balikesirde-orman-yangini-8/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=balikesirde-orman-yangini-8" target="_blank" rel="noopener">Diken</a><a class="kaynak-pill" href="https://www.dunya.com/video-galeri/gundem/kocaelide-orman-yangini-ekiplerin-mudahalesiyle-sonduruldu-video-836338" target="_blank" rel="noopener">Dünya Gazetesi</a><a class="kaynak-pill" href="https://www.evrensel.net/haber/5996476/balikesirde-orman-yangini?utm_source=rss_feed&amp;utm_medium=rss&amp;utm_campaign=rss_syndication" target="_blank" rel="noopener">Evrensel</a><a class="kaynak-pill" href="https://www.evrensel.net/haber/5996471/diyarbakir-in-lice-ilcesinde-orman-yangini?utm_source=rss_feed&amp;utm_medium=rss&amp;utm_campaign=rss_syndication" target="_blank" rel="noopener">Evrensel</a><a class="kaynak-pill" href="https://www.evrensel.net/haber/5996438/antalyada-orman-yangini?utm_source=rss_feed&amp;utm_medium=rss&amp;utm_campaign=rss_syndication" target="_blank" rel="noopener">Evrensel</a><a class="kaynak-pill" href="https://www.haberler.com/guncel/marmaris-te-cikan-orman-yanginina-mudahale-20148311-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.haberler.com/guncel/marmaris-te-orman-yangini-20148299-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.haberler.com/guncel/guncelleme-antalya-da-cikan-orman-yangini-kontrol-20148230-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.haberler.com/guncel/kahramanmaras-ta-cikan-orman-yangini-kontrol-20147931-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.haberler.com/guncel/balikesir-de-orman-yangini-20147769-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.haberler.com/guncel/kocaeli-de-ormanlik-alanda-cikan-yangina-mudahale-20147745-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.haberler.com/guncel/balikesir-in-altieylul-ilcesinde-araziden-ormanlik-20147498-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.haberler.com/cevre/kemer-de-orman-yangini-20147303-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.hurriyet.com.tr/gundem/antalyada-orman-yangini-ekipler-mudahale-ediyor-43274123" target="_blank" rel="noopener">Hürriyet</a><a class="kaynak-pill" href="https://www.karar.com/sehir-haberleri/balikesirde-orman-yangini-11-2065867" target="_blank" rel="noopener">Karar</a><a class="kaynak-pill" href="https://www.ntv.com.tr/turkiye/galeri-antalya-ve-balikesirde-orman-yangini-1737491" target="_blank" rel="noopener">NTV</a><a class="kaynak-pill" href="https://www.yenicaggazetesi.com/antalya-kemerde-yangin-kontrol-altinda-1062235h.htm" target="_blank" rel="noopener">Yeniçağ</a>
+          <a class="kaynak-pill" href="https://www.cnnturk.com/yerel-haberler/duzce/akcakoca/findik-bahcesinde-iha-olabilecegi-degerlendirilen-cisim-bulundu-3454957" target="_blank" rel="noopener">CNN Türk</a><a class="kaynak-pill" href="https://www.haberler.com/3-sayfa/istanbul-da-sahile-iha-oldugu-degerlendirilen-20148063-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.hurriyet.com.tr/gundem/istanbulda-sahile-iha-oldugu-degerlendirilen-cisim-vurdu-43274400" target="_blank" rel="noopener">Hürriyet</a>
         </div>
       </div>
-    </details>
-    <details class="haber">
-      <summary class="haber-baslik-satiri">
-        <div class="rank">06</div>
-        <div class="haber-govde">
-          <div class="ust-satir">
-            <span class="etiket">GENEL / SİYASET</span>
-            <span class="sinyal-sayi">8 KAYNAK</span>
-          </div>
-          <h2 class="baslik">SON DAKİKA... Manisa Salihli&#x27;deki gaz dolum tesisinde patlama! 2 işçi hayatını kaybetti</h2>
-          <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span></div>
+    </article>
+    <article class="haber">
+      <div class="rank">06</div>
+      <div class="haber-govde">
+        <div class="ust-satir">
+          <span class="etiket">GENEL</span>
+          <span class="sinyal-sayi">3 KAYNAK</span>
         </div>
-        <span class="ac-kapa-ikon" aria-hidden="true"></span>
-      </summary>
-      <div class="detay-panel">
-        <p class="ozet-metin">Manisa Salihli&#x27;de bulunan gaz dolum tesisinde sabah saatlerinde yaşanan patlamadan acı haber geldi. Ekiplerin çalışmaları sonucunda işçilerden Servet Ekiz ile kimliği tespit edilemeyen 1 kişinin cansız... Devamı için tıklayınız</p>
+        <h2 class="baslik">Antalya ve Balıkesir&#x27;de orman yangını! Ekipler müdahale ediyor</h2>
+        <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span></div>
         <div class="kaynaklar">
           <span class="kaynaklar-etiket">Kaynaklar:</span>
-          <a class="kaynak-pill" href="https://www.evrensel.net/haber/5996484/antepte-17-yasindaki-suriyeli-isci-hayatini-kaybetti?utm_source=rss_feed&amp;utm_medium=rss&amp;utm_campaign=rss_syndication" target="_blank" rel="noopener">Evrensel</a><a class="kaynak-pill" href="https://www.evrensel.net/haber/5996441/israilin-lubnana-saldirisinda-7-kisi-hayatini-kaybetti?utm_source=rss_feed&amp;utm_medium=rss&amp;utm_campaign=rss_syndication" target="_blank" rel="noopener">Evrensel</a><a class="kaynak-pill" href="https://www.haberler.com/3-sayfa/tup-patlamasinda-hayatini-kaybedenlerin-kimlikleri-20147956-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.haberler.com/haber/manisa-salihli-patlama-son-dakika-salihli-oksijen-20147843-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.haberler.com/guncel/salihli-de-oksijen-dolum-tesisindeki-patlamada-2-20147715-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.haberler.com/guncel/dolum-tesisinde-patlama-sonrasi-yangin-2-olu-2-20147565-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.haberler.com/guncel/manisa-da-oksijen-dolum-tesisinde-cikan-yangin-20147195-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.haberturk.com/sakarya-arifiyede-otomobil-cekici-ve-arizali-minibuse-carpti-surucu-oldu-3905845" target="_blank" rel="noopener">Habertürk</a><a class="kaynak-pill" href="https://www.karar.com/sehir-haberleri/tuzlada-foseptik-cukuruna-giren-isci-hayatini-kaybetti-2065859" target="_blank" rel="noopener">Karar</a><a class="kaynak-pill" href="https://medyascope.tv/2026/08/15/diyarbakirda-minibus-kazasi-7-kisi-hayatini-kaybetti/" target="_blank" rel="noopener">Medyascope</a><a class="kaynak-pill" href="https://www.ntv.com.tr/turkiye/galeri-manisada-dolum-tesisinde-patlama-ekipler-olay-yerinde-1737450" target="_blank" rel="noopener">NTV</a><a class="kaynak-pill" href="https://www.odatv.com/guncel/oksijen-dolum-tesisinde-patlama-iki-can-kaybi-120158832" target="_blank" rel="noopener">OdaTV</a><a class="kaynak-pill" href="https://www.sabah.com.tr/yasam/son-dakika-manisa-salihlideki-gaz-dolum-tesisinde-patlama-2-isci-hayatini-kaybetti-7642022" target="_blank" rel="noopener">Sabah</a>
+          <a class="kaynak-pill" href="https://10haber.net/gundem/antalyada-orman-yangini-ekipler-mudahale-ediyor-728974/" target="_blank" rel="noopener">10Haber</a><a class="kaynak-pill" href="https://www.hurriyet.com.tr/gundem/antalyada-orman-yangini-ekipler-mudahale-ediyor-43274123" target="_blank" rel="noopener">Hürriyet</a><a class="kaynak-pill" href="https://www.ntv.com.tr/turkiye/galeri-antalya-ve-balikesirde-orman-yangini-1737491" target="_blank" rel="noopener">NTV</a>
         </div>
       </div>
-    </details>
-    <details class="haber">
-      <summary class="haber-baslik-satiri">
-        <div class="rank">07</div>
-        <div class="haber-govde">
-          <div class="ust-satir">
-            <span class="etiket">GENEL / SİYASET</span>
-            <span class="sinyal-sayi">7 KAYNAK</span>
-          </div>
-          <h2 class="baslik">TBMM Başkanı Kurtulmuş&#x27;tan &#x27;Terörsüz Türkiye&#x27; mesajı</h2>
-          <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span></div>
+    </article>
+    <article class="haber">
+      <div class="rank">07</div>
+      <div class="haber-govde">
+        <div class="ust-satir">
+          <span class="etiket">GENEL</span>
+          <span class="sinyal-sayi">3 KAYNAK</span>
         </div>
-        <span class="ac-kapa-ikon" aria-hidden="true"></span>
-      </summary>
-      <div class="detay-panel">
-        <p class="ozet-metin">Bosphorus Diplomasi Forumu’nda konuşan Türkiye Büyük Millet Meclisi Başkanı Numan Kurtulmuş, &quot;Bu coğrafyada bizim ülkemizde yaklaşık Cumhuriyetimizin ilk asrının yarısını heba ettiğimiz terör meselesini geride bırakıyoruz. 40 yılı aşkın süredir devam eden binlerce insanımızın şehit olduğu, on binlerce insanımızın öldüğü, köylerin, kentlerin yıkıldığı, tarumar olduğu bu süreci artık geride bırakıyoruz. Bu memlekette Türkler de, Kürtler de, yine diğer etnik yapılardan insanlar da bir ve beraber olarak Allah&#x27;ın izniyle yoluna devam edecektir”…</p>
+        <h2 class="baslik">İçişleri duyurdu: Yeni nesil suç örgütüyle bağlantılı olarak aranan şüpheli Bakü&#x27;de yakalandı</h2>
+        <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span></div>
         <div class="kaynaklar">
           <span class="kaynaklar-etiket">Kaynaklar:</span>
-          <a class="kaynak-pill" href="https://www.aa.com.tr/tr/gundem/tbmm-baskani-kurtulmus-terorsuz-turkiye-aramizdaki-soz-bundan-sonra-ayristirmanin-degil-beraberligin-sozu-olacaktir/4028261" target="_blank" rel="noopener">Anadolu Ajansı</a><a class="kaynak-pill" href="https://www.dunya.com/gundem/tbmm-baskani-kurtulmus-terorsuz-turkiye-ile-yeni-bir-donemin-kapisini-araliyoruz-haberi-836348" target="_blank" rel="noopener">Dünya Gazetesi</a><a class="kaynak-pill" href="https://www.milliyet.com.tr/gundem/tbmm-baskani-kurtulmustan-terorsuz-turkiye-mesaji-7642043" target="_blank" rel="noopener">Milliyet - Gündem</a><a class="kaynak-pill" href="https://www.milliyet.com.tr/gundem/tbmm-baskani-kurtulmustan-terorsuz-turkiye-mesaji-7642043" target="_blank" rel="noopener">Milliyet - Siyaset</a><a class="kaynak-pill" href="https://www.star.com.tr/guncel/tbmm-baskani-kurtulmus-aciklamalarda-bulunuyor-haber-2034130/" target="_blank" rel="noopener">Star Gazete</a><a class="kaynak-pill" href="https://www.takvim.com.tr/guncel/2026/08/15/tbmm-baskani-numan-kurtulmustan-tarihi-yeni-dunya-analizi" target="_blank" rel="noopener">Takvim</a><a class="kaynak-pill" href="https://www.yenicaggazetesi.com/numan-kurtulmustan-terorsuz-turkiye-mesaji-1062237h.htm" target="_blank" rel="noopener">Yeniçağ</a>
+          <a class="kaynak-pill" href="https://www.hurriyet.com.tr/gundem/icisleri-duyurdu-yeni-nesil-suc-orgutuyle-baglantili-olarak-aranan-supheli-bakude-yakalandi-43274475" target="_blank" rel="noopener">Hürriyet</a><a class="kaynak-pill" href="https://www.sabah.com.tr/gundem/2026/08/15/icisleri-bakanligi-duyurdu-aranan-firari-bakude-yakalandi" target="_blank" rel="noopener">Sabah</a><a class="kaynak-pill" href="https://www.takvim.com.tr/guncel/2026/08/15/yeni-nesil-suc-orgutu-baglantili-aranan-supheli-bakude-yakalandi" target="_blank" rel="noopener">Takvim</a>
         </div>
       </div>
-    </details>
-    <details class="haber">
-      <summary class="haber-baslik-satiri">
-        <div class="rank">08</div>
-        <div class="haber-govde">
-          <div class="ust-satir">
-            <span class="etiket">GENEL / SİYASET</span>
-            <span class="sinyal-sayi">7 KAYNAK</span>
-          </div>
-          <h2 class="baslik">Eyüpspor, Emre Bilgin&amp;apos;i kadrosuna kattı</h2>
-          <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span></div>
+    </article>
+    <article class="haber">
+      <div class="rank">08</div>
+      <div class="haber-govde">
+        <div class="ust-satir">
+          <span class="etiket">GENEL</span>
+          <span class="sinyal-sayi">3 KAYNAK</span>
         </div>
-        <span class="ac-kapa-ikon" aria-hidden="true"></span>
-      </summary>
-      <div class="detay-panel">
-        <p class="ozet-metin">Trendyol Süper Lig 2026-2027 sezonunun ilk haftasında Eyüpspor, yarın saat 21.30&#x27;da Tüpraş Stadı&#x27;nda Beşiktaş ile karşılaşacak. Yeni teknik direktör Özhan Pulat yönetimindeki eflatun-sarılılar, zorlu deplasmandan puanla dönmeyi hedefliyor. Eyüpspor, 12 yeni transferle ligdeki üçüncü sezonuna başlayacak.</p>
+        <h2 class="baslik">Türkiye ile Kazakistan arasında sivil havacılık mutabakatı</h2>
+        <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span></div>
         <div class="kaynaklar">
           <span class="kaynaklar-etiket">Kaynaklar:</span>
-          <a class="kaynak-pill" href="https://www.aspor.com.tr/besiktas/2026/08/15/besiktasta-emre-bilgin-eyupspora-transfer-oldu" target="_blank" rel="noopener">A Spor</a><a class="kaynak-pill" href="https://www.aspor.com.tr/futbol/2026/08/15/atletico-madrid-cristian-romeroyu-kadrosuna-katti" target="_blank" rel="noopener">A Spor</a><a class="kaynak-pill" href="https://www.aa.com.tr/tr/spor/konyaspor-4-futbolcuyu-kadrosuna-katti/4028265" target="_blank" rel="noopener">Anadolu Ajansı</a><a class="kaynak-pill" href="https://www.haberler.com/spor/eyupspor-besiktas-tan-kaleci-emre-bilgin-i-20148295-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.haberler.com/spor/lucas-gourna-douath-in-yeni-adresi-hull-city-20148043-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.haberler.com/kripto-para/bitcoinde-satis-baskisi-artiyor-20147407-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.haberler.com/spor/eyupspor-un-super-lig-in-ilk-haftasindaki-rakibi-20147386-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.haberturk.com/atletico-madrid-cristian-romero-yu-kadrosuna-katti-3905811-spor" target="_blank" rel="noopener">Habertürk Spor</a><a class="kaynak-pill" href="https://www.hurriyet.com.tr/sporarena/atletico-madrid-cristian-romeroyu-kadrosuna-katti-43274178" target="_blank" rel="noopener">Hürriyet Spor</a><a class="kaynak-pill" href="https://www.hurriyet.com.tr/sporarena/psg-ferran-torresi-kadrosuna-katti-43274171" target="_blank" rel="noopener">Hürriyet Spor</a><a class="kaynak-pill" href="https://ortacizgi.com/emre-bilgin-eyupspora-transfer-oldu" target="_blank" rel="noopener">Orta Çizgi</a><a class="kaynak-pill" href="https://www.sabah.com.tr/spor/futbol/2026/08/15/emre-bilgin-besiktastan-ayrildi-eyupspora-transfer-oldu" target="_blank" rel="noopener">Sabah Spor</a><a class="kaynak-pill" href="https://www.sabah.com.tr/spor/futbol/2026/08/15/konyaspor-4-futbolcuyu-kadrosuna-katti" target="_blank" rel="noopener">Sabah Spor</a>
+          <a class="kaynak-pill" href="https://www.dunya.com/dunya/turkiye-ile-kazakistan-arasinda-ucus-trafigini-artiracak-yeni-adim-haberi-836347" target="_blank" rel="noopener">Dünya</a><a class="kaynak-pill" href="https://www.haberler.com/ekonomi/turkiye-ile-kazakistan-arasinda-havacilikta-yeni-20147880-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.hurriyet.com.tr/dunya/turkiye-ile-kazakistan-arasinda-sivil-havacilik-mutabakati-43274484" target="_blank" rel="noopener">Hürriyet</a>
         </div>
       </div>
-    </details>
-    <details class="haber">
-      <summary class="haber-baslik-satiri">
-        <div class="rank">09</div>
-        <div class="haber-govde">
-          <div class="ust-satir">
-            <span class="etiket">GENEL / SİYASET</span>
-            <span class="sinyal-sayi">6 KAYNAK</span>
-          </div>
-          <h2 class="baslik">Fethiye&#x27;de dehşet! Annesini öldürüp intihar etti</h2>
-          <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span></div>
+    </article>
+    <article class="haber">
+      <div class="rank">09</div>
+      <div class="haber-govde">
+        <div class="ust-satir">
+          <span class="etiket">GENEL</span>
+          <span class="sinyal-sayi">3 KAYNAK</span>
         </div>
-        <span class="ac-kapa-ikon" aria-hidden="true"></span>
-      </summary>
-      <div class="detay-panel">
-        <p class="ozet-metin">Çiftlik Mahallesi&#x27;ndeki bir sitedeki evlerinde F.S. ile oğlu V.S. arasında tartışma çıktı. Tartışmanın büyümesi üzerine V.S, yanındaki tabancayla annesine ateş etti, ardından aynı silahla kendisini vurdu. İhbar üzerine bölgeye gelen sağlık ekipleri, F.S&#x27;nin yaşamını yitirdiğini belirledi. Ağır yaralanan V.S. ise kaldırıldığı Fethiye Devlet Hastanesi&#x27;nde hayatını kaybetti. 20 kişilik grupla damadının evini basan ilçe başkanı gözaltına alındı! Adını hastalıktan aldı! Şifa arayanları akın ediyor</p>
+        <h2 class="baslik">Kemal Kılıçdaroğlu yeniden aday olacak mı? CHP’den açıklama</h2>
+        <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span></div>
         <div class="kaynaklar">
           <span class="kaynaklar-etiket">Kaynaklar:</span>
-          <a class="kaynak-pill" href="https://www.cnnturk.com/yerel-haberler/mugla/fethiye/mugla-annesini-oldurup-intihar-etti-3454958" target="_blank" rel="noopener">CNN Türk</a><a class="kaynak-pill" href="https://www.cnnturk.com/yerel-haberler/mugla/fethiye/annesini-oldurup-intihar-etti-3454956" target="_blank" rel="noopener">CNN Türk</a><a class="kaynak-pill" href="https://www.cnnturk.com/yerel-haberler/mugla/fethiyede-annesini-silahla-olduren-kisi-intihar-etti-3454941" target="_blank" rel="noopener">CNN Türk</a><a class="kaynak-pill" href="https://www.haberler.com/guncel/annesini-oldurup-intihar-etti-20148209-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.haberler.com/guncel/fethiye-de-annesini-silahla-olduren-kisi-intihar-20148142-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.hurriyet.com.tr/gundem/fethiyede-dehset-annesini-oldurup-intihar-etti-43274461" target="_blank" rel="noopener">Hürriyet</a><a class="kaynak-pill" href="https://www.karar.com/sehir-haberleri/fethiyede-aile-faciasi-annesini-oldurup-intihar-etti-2065877" target="_blank" rel="noopener">Karar</a><a class="kaynak-pill" href="https://www.milliyet.com.tr/gundem/fethiyede-aile-faciasi-annesini-oldurdu-ayni-silahla-intihar-etti-7642031" target="_blank" rel="noopener">Milliyet - Gündem</a><a class="kaynak-pill" href="https://www.milliyet.com.tr/gundem/fethiyede-aile-faciasi-annesini-oldurdu-ayni-silahla-intihar-etti-7642031" target="_blank" rel="noopener">Milliyet - Siyaset</a>
+          <a class="kaynak-pill" href="https://www.haberler.com/haberler/en-yakin-kurmayi-yanit-verdi-kilicdaroglu-yeniden-20148262-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.sozcu.com.tr/kilicdaroglu-yeniden-aday-olacak-mi-chp-den-aciklama-p349632" target="_blank" rel="noopener">Sözcü</a><a class="kaynak-pill" href="https://www.takvim.com.tr/guncel/2026/08/15/bulent-kusoglundan-kilicdaroglu-aciklamasi-bir-daha-aday-olmak-istemez" target="_blank" rel="noopener">Takvim</a>
         </div>
       </div>
-    </details>
-    <details class="haber">
-      <summary class="haber-baslik-satiri">
-        <div class="rank">10</div>
-        <div class="haber-govde">
-          <div class="ust-satir">
-            <span class="etiket">GENEL / SİYASET</span>
-            <span class="sinyal-sayi">6 KAYNAK</span>
-          </div>
-          <h2 class="baslik">Bakan Yumaklı: Hasat sezonunu 140 milyon tonluk rekor üretimle kapatacağız</h2>
-          <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span></div>
+    </article>
+    <article class="haber">
+      <div class="rank">10</div>
+      <div class="haber-govde">
+        <div class="ust-satir">
+          <span class="etiket">GENEL</span>
+          <span class="sinyal-sayi">3 KAYNAK</span>
         </div>
-        <span class="ac-kapa-ikon" aria-hidden="true"></span>
-      </summary>
-      <div class="detay-panel">
-        <p class="ozet-metin">Tarım ve Orman Bakanı İbrahim Yumaklı, Karabük’te AK Parti İl Başkanlığı’nı ziyaret ettikten sonra Eflani ilçesi Esencik köyü mevkiindeki buğday hasat törenine katıldı. Bakan Yumaklı, ilk olarak burada biçerdövere binerek, buğday hasadı yaptı. Törene, Karabük Valisi Oktay Çağatay, AK Parti Karabük milletvekilleri Cem Şahin ve Durmuş Ali Keskinkılıç, Karabük Belediye Başkanı Özkan Çetinkaya, Safranbolu Kaymakamı ve Eflani Kaymakam Vekili Hayrettin Baskın, Eflani Belediye Başkanı Hüsnü Akın, İl Tarım ve Orman Müdürü Yasin Önder ve bakanlık…</p>
+        <h2 class="baslik">Bakan Yumaklı: 140 milyon ton üretimle tüm zamanların rekoru kırılacak</h2>
+        <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span></div>
         <div class="kaynaklar">
           <span class="kaynaklar-etiket">Kaynaklar:</span>
-          <a class="kaynak-pill" href="https://www.aa.com.tr/tr/ekonomi/bakan-yumakli-hasat-sezonunu-140-milyon-tonluk-bir-uretimle-kapatmis-olacagiz/4028310" target="_blank" rel="noopener">Anadolu Ajansı</a><a class="kaynak-pill" href="https://www.cnnturk.com/yerel-haberler/karabuk/eflani/karabuk-bakan-yumakli-hasat-sezonunu-140-milyon-tonluk-rekor-uretimle-kapatacagiz-3454948" target="_blank" rel="noopener">CNN Türk</a><a class="kaynak-pill" href="https://www.dunya.com/sektorler/tarim/tarimda-rekor-beklentisi-yumakli-140-milyon-tonluk-uretim-hedefini-acikladi-haberi-836342" target="_blank" rel="noopener">Dünya Gazetesi</a><a class="kaynak-pill" href="https://www.haberler.com/guncel/bakan-yumakli-hasat-sezonunu-140-milyon-tonluk-20148141-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.milliyet.com.tr/ekonomi/bakan-yumakli-hasat-sezonunu-140-milyon-tonluk-rekor-uretimle-kapatacagiz-7642023" target="_blank" rel="noopener">Milliyet - Gündem</a><a class="kaynak-pill" href="https://www.milliyet.com.tr/ekonomi/bakan-yumakli-hasat-sezonunu-140-milyon-tonluk-rekor-uretimle-kapatacagiz-7642023" target="_blank" rel="noopener">Milliyet - Siyaset</a>
+          <a class="kaynak-pill" href="https://www.aa.com.tr/tr/ekonomi/bakan-yumakli-hasat-sezonunu-140-milyon-tonluk-bir-uretimle-kapatmis-olacagiz/4028310" target="_blank" rel="noopener">Anadolu Ajansı</a><a class="kaynak-pill" href="https://www.cnnturk.com/yerel-haberler/karabuk/eflani/karabuk-bakan-yumakli-hasat-sezonunu-140-milyon-tonluk-rekor-uretimle-kapatacagiz-3454948" target="_blank" rel="noopener">CNN Türk</a><a class="kaynak-pill" href="https://www.haberler.com/guncel/bakan-yumakli-hasat-sezonunu-140-milyon-tonluk-20148141-haberi/" target="_blank" rel="noopener">Haberler.com</a>
         </div>
       </div>
-    </details>
+    </article>
+    <article class="haber">
+      <div class="rank">11</div>
+      <div class="haber-govde">
+        <div class="ust-satir">
+          <span class="etiket">GENEL</span>
+          <span class="sinyal-sayi">3 KAYNAK</span>
+        </div>
+        <h2 class="baslik">14 yıllık faili meçhul cinayet DNA ile çözüldü: Parçalanmış kadın cesedi Gülizar Aydın’a ait çıktı</h2>
+        <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span></div>
+        <div class="kaynaklar">
+          <span class="kaynaklar-etiket">Kaynaklar:</span>
+          <a class="kaynak-pill" href="https://10haber.net/gundem/14-yillik-faili-mechul-cinayet-dna-testiyle-cozuldu-parcalanmis-cesedin-kimligi-saptandi-729004/" target="_blank" rel="noopener">10Haber</a><a class="kaynak-pill" href="https://www.haberler.com/guncel/14-yillik-faili-mechul-cinayet-dna-ile-cozuldu-20147811-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.haberturk.com/son-dakika-haberi-14-yillik-sonra-cinayet-cikti-gulizar-aydin-in-kocasi-tutuklandi-3905816" target="_blank" rel="noopener">Habertürk</a>
+        </div>
+      </div>
+    </article>
+    <article class="haber">
+      <div class="rank">12</div>
+      <div class="haber-govde">
+        <div class="ust-satir">
+          <span class="etiket">GENEL</span>
+          <span class="sinyal-sayi">3 KAYNAK</span>
+        </div>
+        <h2 class="baslik">İran: Fransız diplomatlar gizli toplantıda yakalandı</h2>
+        <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span></div>
+        <div class="kaynaklar">
+          <span class="kaynaklar-etiket">Kaynaklar:</span>
+          <a class="kaynak-pill" href="https://10haber.net/dunya/irandan-fransaya-casusluk-suclamasi-iki-diplomat-gizli-toplantida-yakalandi-729032/" target="_blank" rel="noopener">10Haber</a><a class="kaynak-pill" href="https://www.haberler.com/guncel/iran-ulusal-guvenlik-sorusturmasi-sirasinda-gizli-20147558-haberi/" target="_blank" rel="noopener">Haberler.com</a><a class="kaynak-pill" href="https://www.takvim.com.tr/dunya/iranda-iki-fransiz-diplomat-gizli-toplantida-yakalandi-6492648" target="_blank" rel="noopener">Takvim</a>
+        </div>
+      </div>
+    </article></div>
+    <div id="tab-siyaset" class="tab-content">
+    <article class="haber">
+      <div class="rank">01</div>
+      <div class="haber-govde">
+        <div class="ust-satir">
+          <span class="etiket">SIYASET</span>
+          <span class="sinyal-sayi">5 KAYNAK</span>
+        </div>
+        <h2 class="baslik">İstanbul&#x27;da bazı koru ve kent ormanları ziyarete kapatıldı</h2>
+        <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span></div>
+        <div class="kaynaklar">
+          <span class="kaynaklar-etiket">Kaynaklar:</span>
+          <a class="kaynak-pill" href="https://www.birgun.net/haber/istanbul-da-kuvvetli-ruzgar-bazi-koru-ve-kent-ormanlari-ziyarete-kapatildi-729435" target="_blank" rel="noopener">BirGün - Siyaset</a><a class="kaynak-pill" href="https://www.diken.com.tr/istanbulda-yarin-bazi-yollar-trafige-kapatilacak-3/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=istanbulda-yarin-bazi-yollar-trafige-kapatilacak-3" target="_blank" rel="noopener">Diken</a><a class="kaynak-pill" href="https://www.evrensel.net/haber/5996453/istanbulda-kuvvetli-ruzgar-onlemi-koru-ve-kent-ormanlari-ziyarete-kapatildi?utm_source=rss_feed&amp;utm_medium=rss&amp;utm_campaign=rss_syndication" target="_blank" rel="noopener">Evrensel - Politika</a><a class="kaynak-pill" href="https://www.karar.com/sehir-haberleri/istanbulda-yarin-bazi-yollar-trafige-kapatilacak-11-2065855" target="_blank" rel="noopener">Karar</a><a class="kaynak-pill" href="https://www.odatv.com/guncel/istanbulda-firtina-uyarisi-120158848" target="_blank" rel="noopener">OdaTV</a>
+        </div>
+      </div>
+    </article>
+    <article class="haber">
+      <div class="rank">02</div>
+      <div class="haber-govde">
+        <div class="ust-satir">
+          <span class="etiket">SIYASET</span>
+          <span class="sinyal-sayi">4 KAYNAK</span>
+        </div>
+        <h2 class="baslik">Beşiktaş ve Trabzonspor&#x27;un Avrupa maçlarını yönetecek hakemler belli oldu</h2>
+        <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik "></span><span class="centik "></span><span class="centik "></span></div>
+        <div class="kaynaklar">
+          <span class="kaynaklar-etiket">Kaynaklar:</span>
+          <a class="kaynak-pill" href="https://www.birgun.net/haber/besiktas-ve-trabzonspor-un-avrupa-maclarinin-hakemleri-belli-oldu-729453" target="_blank" rel="noopener">BirGün - Siyaset</a><a class="kaynak-pill" href="https://www.diken.com.tr/besiktas-ve-trabzonsporun-avrupa-maclarini-yonetecek-hakemler-belli-oldu/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=besiktas-ve-trabzonsporun-avrupa-maclarini-yonetecek-hakemler-belli-oldu" target="_blank" rel="noopener">Diken</a><a class="kaynak-pill" href="https://www.evrensel.net/haber/5996479/besiktas-ve-trabzonsporun-avrupa-maclarinda-hakemler-belli-oldu-maclari-kim-yonetecek?utm_source=rss_feed&amp;utm_medium=rss&amp;utm_campaign=rss_syndication" target="_blank" rel="noopener">Evrensel - Politika</a><a class="kaynak-pill" href="https://www.karar.com/spor-haberleri/besiktas-ve-trabzonsporun-uefa-avrupa-liginde-maclarini-yonetecek-2065864" target="_blank" rel="noopener">Karar</a>
+        </div>
+      </div>
+    </article>
+    <article class="haber">
+      <div class="rank">03</div>
+      <div class="haber-govde">
+        <div class="ust-satir">
+          <span class="etiket">SIYASET</span>
+          <span class="sinyal-sayi">4 KAYNAK</span>
+        </div>
+        <h2 class="baslik">Balıkesir&#x27;de orman yangını</h2>
+        <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik "></span><span class="centik "></span><span class="centik "></span></div>
+        <div class="kaynaklar">
+          <span class="kaynaklar-etiket">Kaynaklar:</span>
+          <a class="kaynak-pill" href="https://www.diken.com.tr/balikesirde-orman-yangini-8/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=balikesirde-orman-yangini-8" target="_blank" rel="noopener">Diken</a><a class="kaynak-pill" href="https://www.evrensel.net/haber/5996438/antalyada-orman-yangini?utm_source=rss_feed&amp;utm_medium=rss&amp;utm_campaign=rss_syndication" target="_blank" rel="noopener">Evrensel - Politika</a><a class="kaynak-pill" href="https://www.hurriyet.com.tr/gundem/antalyada-orman-yangini-ekipler-mudahale-ediyor-43274123" target="_blank" rel="noopener">Hürriyet - Gündem</a><a class="kaynak-pill" href="https://www.karar.com/sehir-haberleri/balikesirde-orman-yangini-11-2065867" target="_blank" rel="noopener">Karar</a>
+        </div>
+      </div>
+    </article>
+    <article class="haber">
+      <div class="rank">04</div>
+      <div class="haber-govde">
+        <div class="ust-satir">
+          <span class="etiket">SIYASET</span>
+          <span class="sinyal-sayi">3 KAYNAK</span>
+        </div>
+        <h2 class="baslik">TBMM Başkanı Kurtulmuş&#x27;tan &#x27;Terörsüz Türkiye&#x27; mesajı</h2>
+        <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span></div>
+        <div class="kaynaklar">
+          <span class="kaynaklar-etiket">Kaynaklar:</span>
+          <a class="kaynak-pill" href="https://www.hurriyet.com.tr/gundem/tbmm-baskani-kurtulmustan-terorsuz-turkiye-mesaji-43274409" target="_blank" rel="noopener">Hürriyet - Gündem</a><a class="kaynak-pill" href="https://www.milliyet.com.tr/gundem/tbmm-baskani-kurtulmustan-terorsuz-turkiye-mesaji-7642043" target="_blank" rel="noopener">Milliyet - Siyaset</a><a class="kaynak-pill" href="https://www.yenicaggazetesi.com/numan-kurtulmustan-terorsuz-turkiye-mesaji-1062237h.htm" target="_blank" rel="noopener">Yeniçağ - Siyaset</a>
+        </div>
+      </div>
+    </article>
+    <article class="haber">
+      <div class="rank">05</div>
+      <div class="haber-govde">
+        <div class="ust-satir">
+          <span class="etiket">SIYASET</span>
+          <span class="sinyal-sayi">3 KAYNAK</span>
+        </div>
+        <h2 class="baslik">Diyarbakır&#x27;da minibüs kazası: Yedi ölü, dokuz yaralı</h2>
+        <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span></div>
+        <div class="kaynaklar">
+          <span class="kaynaklar-etiket">Kaynaklar:</span>
+          <a class="kaynak-pill" href="https://www.birgun.net/haber/diyarbakir-da-minibus-devrildi-olu-sayisi-7-ye-yukseldi-cok-sayida-yarali-var-729409" target="_blank" rel="noopener">BirGün - Siyaset</a><a class="kaynak-pill" href="https://www.diken.com.tr/diyarbakirda-minibus-kazasi-yedi-olu-dokuz-yarali/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=diyarbakirda-minibus-kazasi-yedi-olu-dokuz-yarali" target="_blank" rel="noopener">Diken</a><a class="kaynak-pill" href="https://www.evrensel.net/haber/5996436/diyarbakir-da-minibus-devrildi-5-kisi-oldu-11-kisi-yaralandi?utm_source=rss_feed&amp;utm_medium=rss&amp;utm_campaign=rss_syndication" target="_blank" rel="noopener">Evrensel - Politika</a>
+        </div>
+      </div>
+    </article>
+    <article class="haber">
+      <div class="rank">06</div>
+      <div class="haber-govde">
+        <div class="ust-satir">
+          <span class="etiket">SIYASET</span>
+          <span class="sinyal-sayi">3 KAYNAK</span>
+        </div>
+        <h2 class="baslik">Demirtaş ve Mızraklı&#x27;dan &#x27;çerçeve yasa&#x27; mesajı: İmralı Heyeti çağrı yaptı</h2>
+        <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span></div>
+        <div class="kaynaklar">
+          <span class="kaynaklar-etiket">Kaynaklar:</span>
+          <a class="kaynak-pill" href="https://www.birgun.net/haber/demirtas-ve-mizrakli-dan-cerceve-yasa-mesaji-imrali-heyeti-cagri-yapti-729459" target="_blank" rel="noopener">BirGün - Siyaset</a><a class="kaynak-pill" href="https://www.evrensel.net/haber/5996487/dem-parti-imrali-heyeti-demirtas-ve-mizrakli-yi-ziyaret-etti?utm_source=rss_feed&amp;utm_medium=rss&amp;utm_campaign=rss_syndication" target="_blank" rel="noopener">Evrensel - Politika</a><a class="kaynak-pill" href="https://www.indyturk.com/node/781284/siyaset/dem-parti-i%CC%87mral%C4%B1-heyeti-demirta%C5%9F-ve-m%C4%B1zrakl%C4%B1y%C4%B1-ziyaret-etti" target="_blank" rel="noopener">Independent Türkçe</a>
+        </div>
+      </div>
+    </article>
+    <article class="haber">
+      <div class="rank">07</div>
+      <div class="haber-govde">
+        <div class="ust-satir">
+          <span class="etiket">SIYASET</span>
+          <span class="sinyal-sayi">3 KAYNAK</span>
+        </div>
+        <h2 class="baslik">Tuzla&#x27;da temizlik için foseptik çukuruna giren işçi hayatını kaybetti</h2>
+        <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span></div>
+        <div class="kaynaklar">
+          <span class="kaynaklar-etiket">Kaynaklar:</span>
+          <a class="kaynak-pill" href="https://www.birgun.net/haber/tuzla-da-temizlik-icin-foseptik-cukuruna-giren-isci-hayatini-kaybetti-729452" target="_blank" rel="noopener">BirGün - Siyaset</a><a class="kaynak-pill" href="https://www.evrensel.net/haber/5996470/tuzlada-is-cinayeti-foseptik-cukuruna-giren-isci-hayatini-kaybetti?utm_source=rss_feed&amp;utm_medium=rss&amp;utm_campaign=rss_syndication" target="_blank" rel="noopener">Evrensel - Politika</a><a class="kaynak-pill" href="https://www.karar.com/sehir-haberleri/tuzlada-foseptik-cukuruna-giren-isci-hayatini-kaybetti-2065859" target="_blank" rel="noopener">Karar</a>
+        </div>
+      </div>
+    </article>
+    <article class="haber">
+      <div class="rank">08</div>
+      <div class="haber-govde">
+        <div class="ust-satir">
+          <span class="etiket">SIYASET</span>
+          <span class="sinyal-sayi">3 KAYNAK</span>
+        </div>
+        <h2 class="baslik">Bülent Kuşoğlu&#x27;ndan açıklama: Kılıçdaroğlu yeniden aday olacak mı?</h2>
+        <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span></div>
+        <div class="kaynaklar">
+          <span class="kaynaklar-etiket">Kaynaklar:</span>
+          <a class="kaynak-pill" href="https://www.birgun.net/haber/bulent-kusoglu-ndan-aciklama-kilicdaroglu-yeniden-aday-olacak-mi-729451" target="_blank" rel="noopener">BirGün - Siyaset</a><a class="kaynak-pill" href="https://www.evrensel.net/haber/5996510/chp-genel-baskan-yardimcisi-kusoglundan-aciklama-kilicdaroglu-yeniden-aday-olacak-mi?utm_source=rss_feed&amp;utm_medium=rss&amp;utm_campaign=rss_syndication" target="_blank" rel="noopener">Evrensel - Politika</a><a class="kaynak-pill" href="https://www.yenicaggazetesi.com/kilicdaroglu-yeniden-aday-olacak-mi-chpli-bulent-kusoglu-acikladi-1062226h.htm" target="_blank" rel="noopener">Yeniçağ - Siyaset</a>
+        </div>
+      </div>
+    </article>
+    <article class="haber">
+      <div class="rank">09</div>
+      <div class="haber-govde">
+        <div class="ust-satir">
+          <span class="etiket">SIYASET</span>
+          <span class="sinyal-sayi">3 KAYNAK</span>
+        </div>
+        <h2 class="baslik">Daltonlar ve Baygaralar suç örgütlerine yönelik operasyon: 7 şüpheli tutuklandı</h2>
+        <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span></div>
+        <div class="kaynaklar">
+          <span class="kaynaklar-etiket">Kaynaklar:</span>
+          <a class="kaynak-pill" href="https://www.birgun.net/haber/daltonlar-ve-baygaralar-suc-orgutlerine-yonelik-operasyon-7-supheli-tutuklandi-729420" target="_blank" rel="noopener">BirGün - Siyaset</a><a class="kaynak-pill" href="https://www.evrensel.net/haber/5996439/daltonlar-ve-baygaralar-a-yonelik-operasyonda-7-supheli-tutuklandi?utm_source=rss_feed&amp;utm_medium=rss&amp;utm_campaign=rss_syndication" target="_blank" rel="noopener">Evrensel - Politika</a><a class="kaynak-pill" href="https://medyascope.tv/2026/08/15/daltonlar-ve-baygaralar-cetelerine-operasyon-7-kisi-tutuklandi/" target="_blank" rel="noopener">Medyascope</a>
+        </div>
+      </div>
+    </article></div>
+    <div id="tab-futbol" class="tab-content">
+    <article class="haber">
+      <div class="rank">01</div>
+      <div class="haber-govde">
+        <div class="ust-satir">
+          <span class="etiket">FUTBOL</span>
+          <span class="sinyal-sayi">4 KAYNAK</span>
+        </div>
+        <h2 class="baslik">Hull City, Lucas Gourna-Douath’ı renklerine bağladı!</h2>
+        <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span></div>
+        <div class="kaynaklar">
+          <span class="kaynaklar-etiket">Kaynaklar:</span>
+          <a class="kaynak-pill" href="https://www.aspor.com.tr/futbol/2026/08/15/lucas-gourna-douathin-yeni-adresi-hull-city" target="_blank" rel="noopener">A Spor</a><a class="kaynak-pill" href="https://www.haberturk.com/lucas-gourna-douathin-yeni-adresi-hull-city-3905840-spor" target="_blank" rel="noopener">Habertürk Spor</a><a class="kaynak-pill" href="https://www.hurriyet.com.tr/sporarena/lucas-gourna-douathin-yeni-adresi-hull-city-43274462" target="_blank" rel="noopener">Hürriyet Spor</a><a class="kaynak-pill" href="https://www.sabah.com.tr/spor/futbol/2026/08/15/hull-city-lucas-gourna-douathi-renklerine-bagladi" target="_blank" rel="noopener">Sabah Spor</a>
+        </div>
+      </div>
+    </article>
+    <article class="haber">
+      <div class="rank">02</div>
+      <div class="haber-govde">
+        <div class="ust-satir">
+          <span class="etiket">FUTBOL</span>
+          <span class="sinyal-sayi">4 KAYNAK</span>
+        </div>
+        <h2 class="baslik">Beşiktaş, Eyüpspor maçına hazır!</h2>
+        <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span></div>
+        <div class="kaynaklar">
+          <span class="kaynaklar-etiket">Kaynaklar:</span>
+          <a class="kaynak-pill" href="https://www.aspor.com.tr/besiktas/2026/08/15/besiktas-eyupspor-macina-hazir" target="_blank" rel="noopener">A Spor</a><a class="kaynak-pill" href="https://www.haberturk.com/besiktas-eyupspor-macina-hazir-3905839-spor" target="_blank" rel="noopener">Habertürk Spor</a><a class="kaynak-pill" href="https://www.hurriyet.com.tr/sporarena/besiktas-eyupspor-maci-hazirliklarini-tamamladi-43274377" target="_blank" rel="noopener">Hürriyet Spor</a><a class="kaynak-pill" href="https://www.sabah.com.tr/spor/futbol/2026/08/15/besiktas-eyupspor-macina-hazir" target="_blank" rel="noopener">Sabah Spor</a>
+        </div>
+      </div>
+    </article>
+    <article class="haber">
+      <div class="rank">03</div>
+      <div class="haber-govde">
+        <div class="ust-satir">
+          <span class="etiket">FUTBOL</span>
+          <span class="sinyal-sayi">4 KAYNAK</span>
+        </div>
+        <h2 class="baslik">Avrupa&#x27;da Beşiktaş ve Trabzonspor maçlarını yönetecek hakemler belli oldu</h2>
+        <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span></div>
+        <div class="kaynaklar">
+          <span class="kaynaklar-etiket">Kaynaklar:</span>
+          <a class="kaynak-pill" href="https://www.aspor.com.tr/avrupa-ligi/2026/08/15/besiktas-ve-trabzonsporun-uefa-avrupa-liginde-maclarini-yonetecek-hakemler-belli-oldu" target="_blank" rel="noopener">A Spor</a><a class="kaynak-pill" href="https://www.fotomac.com.tr/trabzonspor/2026/08/15/trabzonsporun-uefa-avrupa-liginde-oynayacagi-maclarin-hakemleri-belli-oldu" target="_blank" rel="noopener">Fotomaç</a><a class="kaynak-pill" href="https://www.sozcu.com.tr/avrupa-da-besiktas-ve-trabzonspor-maclarini-yonetecek-hakemler-belli-oldu-p349636" target="_blank" rel="noopener">Sözcü Futbol</a><a class="kaynak-pill" href="https://www.sozcu.com.tr/avrupa-da-besiktas-ve-trabzonspor-maclarini-yonetecek-hakemler-belli-oldu-p349636" target="_blank" rel="noopener">Sözcü Spor</a>
+        </div>
+      </div>
+    </article>
+    <article class="haber">
+      <div class="rank">04</div>
+      <div class="haber-govde">
+        <div class="ust-satir">
+          <span class="etiket">FUTBOL</span>
+          <span class="sinyal-sayi">4 KAYNAK</span>
+        </div>
+        <h2 class="baslik">Atletico Madrid, Cristian Romero&#x27;yu kadrosuna kattı</h2>
+        <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span></div>
+        <div class="kaynaklar">
+          <span class="kaynaklar-etiket">Kaynaklar:</span>
+          <a class="kaynak-pill" href="https://www.aspor.com.tr/futbol/2026/08/15/atletico-madrid-cristian-romeroyu-kadrosuna-katti" target="_blank" rel="noopener">A Spor</a><a class="kaynak-pill" href="https://www.fotomac.com.tr/avrupadanfutbol/2026/08/15/atletico-madrid-cristian-romero-transfer-etti" target="_blank" rel="noopener">Fotomaç</a><a class="kaynak-pill" href="https://www.haberturk.com/atletico-madrid-cristian-romero-yu-kadrosuna-katti-3905811-spor" target="_blank" rel="noopener">Habertürk Spor</a><a class="kaynak-pill" href="https://www.hurriyet.com.tr/sporarena/atletico-madrid-cristian-romeroyu-kadrosuna-katti-43274178" target="_blank" rel="noopener">Hürriyet Spor</a>
+        </div>
+      </div>
+    </article>
+    <article class="haber">
+      <div class="rank">05</div>
+      <div class="haber-govde">
+        <div class="ust-satir">
+          <span class="etiket">FUTBOL</span>
+          <span class="sinyal-sayi">3 KAYNAK</span>
+        </div>
+        <h2 class="baslik">CANLI | Süper Lig’de Gençlerbirliği – Fenerbahçe maçı! Muhtemel 11&#x27;ler</h2>
+        <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span></div>
+        <div class="kaynaklar">
+          <span class="kaynaklar-etiket">Kaynaklar:</span>
+          <a class="kaynak-pill" href="https://www.sabah.com.tr/spor/futbol/2026/08/15/canli-super-ligde-genclerbirligi-fenerbahce-maci-ne-zaman-saat-kacta-hangi-kanalda" target="_blank" rel="noopener">Sabah Spor</a><a class="kaynak-pill" href="https://www.sozcu.com.tr/genclerbirligi-fenerbahce-macina-iskoc-var-hakemi-p349595" target="_blank" rel="noopener">Sözcü Futbol</a><a class="kaynak-pill" href="https://www.sozcu.com.tr/genclerbirligi-fenerbahce-macina-iskoc-var-hakemi-p349595" target="_blank" rel="noopener">Sözcü Spor</a>
+        </div>
+      </div>
+    </article>
+    <article class="haber">
+      <div class="rank">06</div>
+      <div class="haber-govde">
+        <div class="ust-satir">
+          <span class="etiket">FUTBOL</span>
+          <span class="sinyal-sayi">3 KAYNAK</span>
+        </div>
+        <h2 class="baslik">Emre Bilgin, Beşiktaş’tan ayrıldı! Eyüpspor&#x27;a transfer oldu</h2>
+        <div class="sinyal-metre"><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik dolu"></span><span class="centik "></span><span class="centik "></span><span class="centik "></span><span class="centik "></span></div>
+        <div class="kaynaklar">
+          <span class="kaynaklar-etiket">Kaynaklar:</span>
+          <a class="kaynak-pill" href="https://www.aspor.com.tr/besiktas/2026/08/15/besiktasta-emre-bilgin-eyupspora-transfer-oldu" target="_blank" rel="noopener">A Spor</a><a class="kaynak-pill" href="https://ortacizgi.com/emre-bilgin-eyupspora-transfer-oldu" target="_blank" rel="noopener">Orta Çizgi</a><a class="kaynak-pill" href="https://www.sabah.com.tr/spor/futbol/2026/08/15/emre-bilgin-besiktastan-ayrildi-eyupspora-transfer-oldu" target="_blank" rel="noopener">Sabah Spor</a>
+        </div>
+      </div>
+    </article></div>
   </main>
+
   <footer>
-    Bu sayfa 50 haber/spor kaynağının RSS akışı otomatik taranarak
-    her 30 dakikada bir yeniden üretilir. Sıralama, bir başlığın kaç farklı
-    kaynakta aynı anda geçtiğine göre yapılır. Bir haberin üstüne tıklayarak
-    özetini açıp kapatabilirsin.
+    Haberler her 30 dakikada bir güncellenir. En az 3 bağımsız kaynakta yer alan başlıklar listelenir.
   </footer>
+
   <script>
-    (function() {
-      var kayitliTema = localStorage.getItem('gundem-tema');
-      if (kayitliTema) {
-        document.documentElement.setAttribute('data-tema', kayitliTema);
-      }
-      guncelleButonMetni();
-    })();
-
-    function temaDegistir() {
-      var mevcut = document.documentElement.getAttribute('data-tema');
-      var yeni = mevcut === 'acik' ? 'koyu' : 'acik';
-      document.documentElement.setAttribute('data-tema', yeni);
-      localStorage.setItem('gundem-tema', yeni);
-      guncelleButonMetni();
-    }
-
-    function guncelleButonMetni() {
-      var mevcut = document.documentElement.getAttribute('data-tema');
-      var buton = document.getElementById('tema-buton');
-      if (!buton) return;
-      buton.textContent = mevcut === 'acik' ? '● Karanlık' : '☀ Aydınlık';
+    function tabSec(kategori) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      
+      event.target.classList.add('active');
+      document.getElementById('tab-' + kategori).classList.add('active');
     }
   </script>
 </body>
